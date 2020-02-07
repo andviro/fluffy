@@ -1,36 +1,102 @@
 package fluffy
 
-type knowledgeBase struct {
-	CoreFIS
-	Inputs  map[string]Variable
-	Outputs map[string]Variable
-	Rules   map[float64]Rule
+import "math"
+
+type KnowledgeBase interface {
+	And(a float64, b float64) float64
+	Or(a float64, b float64) float64
+	GetInput(name string) Variable
+	Activate(c Clause, w float64)
 }
 
-func (kb *knowledgeBase) GetInput(name string) Variable {
-	return kb.Inputs[name]
+type TSK struct {
+	AndMethod func(float64, float64) float64
+	OrMethod  func(float64, float64) float64
+	Inputs    []Variable
+	Outputs   []TSKOutput
+	Rules     []Rule
 }
 
-func (kb *knowledgeBase) SetInput(name string, value float64) {
-	kb.Inputs[name] = kb.Inputs[name].SetValue(value)
+type TSKOutput struct {
+	Name        string
+	Terms       []TSKTerm
+	evaluations []WZ
 }
 
-func (kb *knowledgeBase) evaluate() map[string]map[string][]float64 {
-	res := make(map[string]map[string][]float64)
-	for strength, rule := range kb.Rules {
-		val := strength * rule.Antecedent.Evaluate(kb)
-		for _, c := range rule.Consequents {
-			mf, ok := res[c.Variable]
-			if !ok {
-				mf = make(map[string][]float64)
-			}
-			mf[c.Term] = append(mf[c.Term], val)
-			res[c.Variable] = mf
-		}
+type WZ struct {
+	W, Z float64
+}
+
+type TSKTerm struct {
+	Name   string
+	Coeffs []float64
+}
+
+func (t TSKTerm) Evaluate(kb *TSK) float64 {
+	if len(t.Coeffs) == 1 {
+		return t.Coeffs[0]
+	}
+	res := 0.0
+	for i, k := range t.Coeffs {
+		res += k * kb.Inputs[i].GetValue()
 	}
 	return res
 }
 
-type sugeno struct {
-	knowledgeBase
+func (v TSKOutput) GetValue() float64 {
+	num, denom := 0.0, 0.0
+	for _, wz := range v.evaluations {
+		denom += wz.W
+		num += wz.W * wz.Z
+	}
+	if denom == 0 {
+		return math.NaN()
+	}
+	return num / denom
+}
+
+var _ KnowledgeBase = (*TSK)(nil)
+
+func (kb *TSK) And(a float64, b float64) float64 {
+	if kb.AndMethod != nil {
+		return kb.AndMethod(a, b)
+	}
+	return math.Min(a, b)
+}
+
+func (kb *TSK) Or(a float64, b float64) float64 {
+	if kb.OrMethod != nil {
+		return kb.OrMethod(a, b)
+	}
+	return math.Max(a, b)
+}
+
+func (kb *TSK) GetInput(name string) Variable {
+	for _, i := range kb.Inputs {
+		if i.Name == name {
+			return i
+		}
+	}
+	return Variable{Name: name}
+}
+
+func (kb *TSK) Activate(c Clause, w float64) {
+	for i, o := range kb.Outputs {
+		if o.Name == c.Variable {
+			for _, t := range o.Terms {
+				if t.Name == c.Term {
+					kb.Outputs[i].evaluations = append(kb.Outputs[i].evaluations, WZ{W: w, Z: t.Evaluate(kb)})
+				}
+			}
+		}
+	}
+}
+
+func (kb *TSK) Evaluate() {
+	for i := range kb.Outputs {
+		kb.Outputs[i].evaluations = nil
+	}
+	for _, r := range kb.Rules {
+		r.Evaluate(kb)
+	}
 }

@@ -1,41 +1,36 @@
 package fluffy
 
-type KnowledgeBase interface {
-	And(a float64, b float64) float64
-	Or(a float64, b float64) float64
-	GetInput(name string) Variable
-}
-
 type Evaluator interface {
-	Evaluate(src KnowledgeBase) float64
-}
-
-type Clause struct {
-	Variable string
-	Term     string
-}
-
-func (c Clause) Evaluate(src KnowledgeBase) float64 {
-	return src.GetInput(c.Variable).termValues[c.Term]
+	Evaluate(kb KnowledgeBase) float64
 }
 
 type Rule struct {
+	Weight      float64
+	AndMethod   func(float64, float64) float64
+	OrMethod    func(float64, float64) float64
 	Antecedent  Evaluator
 	Consequents []Clause
+	KnowledgeBase
 }
 
-type Binary struct {
-	A, B Evaluator
+func (r *Rule) And(a float64, b float64) float64 {
+	if r.AndMethod != nil {
+		return r.AndMethod(a, b)
+	}
+	return r.KnowledgeBase.And(a, b)
 }
 
-type And Binary
-
-func (a And) Evaluate(src KnowledgeBase) float64 {
-	return src.And(a.A.Evaluate(src), a.B.Evaluate(src))
+func (r *Rule) Or(a float64, b float64) float64 {
+	if r.OrMethod != nil {
+		return r.OrMethod(a, b)
+	}
+	return r.KnowledgeBase.Or(a, b)
 }
 
-type Or Binary
-
-func (a Or) Evaluate(src KnowledgeBase) float64 {
-	return src.Or(a.A.Evaluate(src), a.B.Evaluate(src))
+func (r *Rule) Evaluate(kb KnowledgeBase) {
+	r.KnowledgeBase = kb
+	w := r.Antecedent.Evaluate(r)
+	for _, c := range r.Consequents {
+		kb.Activate(c, w*r.Weight)
+	}
 }
