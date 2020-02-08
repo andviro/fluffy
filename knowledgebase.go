@@ -1,6 +1,8 @@
 package fluffy
 
-import "math"
+import (
+	"math"
+)
 
 type KnowledgeBase interface {
 	And(a float64, b float64) float64
@@ -36,9 +38,9 @@ func (t TSKTerm) Evaluate(kb *TSK) float64 {
 	if len(t.Coeffs) == 1 {
 		return t.Coeffs[0]
 	}
-	res := 0.0
-	for i, k := range t.Coeffs {
-		res += k * kb.Inputs[i].GetValue()
+	res := t.Coeffs[len(t.Coeffs)-1]
+	for i := len(t.Coeffs) - 2; i >= 0; i-- {
+		res += t.Coeffs[i] * kb.Inputs[i].GetValue()
 	}
 	return res
 }
@@ -99,4 +101,22 @@ func (kb *TSK) Evaluate() {
 	for _, r := range kb.Rules {
 		r.Evaluate(kb)
 	}
+}
+
+func (kb *TSK) SetInput(name string, value float64) {
+	for i := range kb.Inputs {
+		if kb.Inputs[i].Name == name {
+			kb.Inputs[i].SetValue(value)
+			break
+		}
+	}
+}
+
+func (kb *TSK) GetOutput(name string) float64 {
+	for _, i := range kb.Outputs {
+		if i.Name == name {
+			return i.GetValue()
+		}
+	}
+	return math.NaN()
 }

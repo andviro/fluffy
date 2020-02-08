@@ -4,7 +4,7 @@ type LeftLinear struct {
 	A, B float64
 }
 
-func (f *LeftLinear) Value(x float64) float64 {
+func (f LeftLinear) Value(x float64) float64 {
 	switch {
 	case x <= f.A:
 		return 1.0
@@ -16,7 +16,7 @@ func (f *LeftLinear) Value(x float64) float64 {
 
 type RightLinear LeftLinear
 
-func (f *RightLinear) Value(x float64) float64 {
+func (f RightLinear) Value(x float64) float64 {
 	switch {
 	case x <= f.A:
 		return 0.0

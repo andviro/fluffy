@@ -4,7 +4,7 @@ type Triangle struct {
 	A, B, C float64
 }
 
-func (f *Triangle) Value(x float64) float64 {
+func (f Triangle) Value(x float64) float64 {
 	switch {
 	case x == f.B:
 		return 1.0
