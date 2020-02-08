@@ -12,7 +12,8 @@ func (v *Variable) SetValue(value float64) {
 	v.value = value
 	v.termValues = make(map[string]float64)
 	for _, t := range v.Terms {
-		v.termValues[t.Name] = t.MembershipValue(value)
+		m := t.MembershipValue(value)
+		v.termValues[t.Name] = m
 	}
 }
 

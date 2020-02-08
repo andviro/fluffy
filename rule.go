@@ -1,36 +1,43 @@
 package fluffy
 
+import (
+	"github.com/andviro/fluffy/op"
+)
+
 type Evaluator interface {
-	Evaluate(kb KnowledgeBase) float64
+	Evaluate(fis FIS) float64
 }
 
 type Rule struct {
 	Weight      float64
-	AndMethod   func(float64, float64) float64
-	OrMethod    func(float64, float64) float64
+	AndMethod   op.Binary
+	OrMethod    op.Binary
 	Antecedent  Evaluator
 	Consequents []Clause
-	KnowledgeBase
 }
 
-func (r *Rule) And(a float64, b float64) float64 {
+type rule struct {
+	*Rule
+	FIS
+}
+
+func (r rule) And(a float64, b float64) float64 {
 	if r.AndMethod != nil {
 		return r.AndMethod(a, b)
 	}
-	return r.KnowledgeBase.And(a, b)
+	return r.FIS.And(a, b)
 }
 
-func (r *Rule) Or(a float64, b float64) float64 {
+func (r rule) Or(a float64, b float64) float64 {
 	if r.OrMethod != nil {
 		return r.OrMethod(a, b)
 	}
-	return r.KnowledgeBase.Or(a, b)
+	return r.FIS.Or(a, b)
 }
 
-func (r *Rule) Evaluate(kb KnowledgeBase) {
-	r.KnowledgeBase = kb
-	w := r.Antecedent.Evaluate(r)
+func (r *Rule) Evaluate(fis FIS) {
+	w := r.Antecedent.Evaluate(rule{Rule: r, FIS: fis})
 	for _, c := range r.Consequents {
-		kb.Activate(c, w*r.Weight)
+		fis.Activate(c, w*r.Weight)
 	}
 }
