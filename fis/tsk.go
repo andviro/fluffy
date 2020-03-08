@@ -17,7 +17,7 @@ type TSK struct {
 }
 
 type TSKOutput struct {
-	Name        string
+	Name        fluffy.VariableName
 	Terms       []TSKTerm
 	evaluations []wz
 }
@@ -27,7 +27,7 @@ type wz struct {
 }
 
 type TSKTerm struct {
-	Name   string
+	Name   fluffy.TermName
 	Coeffs []float64
 	z      float64
 }
@@ -75,7 +75,7 @@ func (fis *TSK) Or(a float64, b float64) float64 {
 	return op.Max(a, b)
 }
 
-func (fis *TSK) GetInput(name string) fluffy.Variable {
+func (fis *TSK) GetInput(name fluffy.VariableName) fluffy.Variable {
 	for _, i := range fis.Inputs {
 		if i.Name == name {
 			return i
@@ -116,7 +116,7 @@ func (fis *TSK) Evaluate() {
 	}
 }
 
-func (fis *TSK) SetInput(name string, value float64) {
+func (fis *TSK) SetInput(name fluffy.VariableName, value float64) {
 	for i := range fis.Inputs {
 		if fis.Inputs[i].Name == name {
 			fis.Inputs[i].SetValue(value)
@@ -125,7 +125,7 @@ func (fis *TSK) SetInput(name string, value float64) {
 	}
 }
 
-func (fis *TSK) GetOutput(name string) float64 {
+func (fis *TSK) GetOutput(name fluffy.VariableName) float64 {
 	for _, i := range fis.Outputs {
 		if i.Name == name {
 			return i.GetValue()

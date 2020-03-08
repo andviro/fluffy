@@ -5,7 +5,7 @@ import (
 )
 
 type Term struct {
-	Name           string
+	Name           TermName
 	MembershipFunc interface{ Value(x float64) float64 }
 }
 

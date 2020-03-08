@@ -2,9 +2,12 @@ package fluffy
 
 import "math"
 
+type VariableName string
+type TermName string
+
 type Clause struct {
-	Variable string
-	Term     string
+	Variable VariableName
+	Term     TermName
 }
 
 func (c Clause) Evaluate(fis FIS) float64 {
