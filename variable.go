@@ -1,8 +1,9 @@
 package fluffy
 
 type Variable struct {
-	Name  VariableName
-	Terms []Term
+	Name       VariableName
+	Terms      []Term
+	XMin, XMax float64
 
 	value      float64
 	termValues map[TermName]float64

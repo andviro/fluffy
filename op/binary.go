@@ -39,6 +39,10 @@ func Probor(a float64, b float64) float64 {
 	return a + b - (a * b)
 }
 
+func Mul(a float64, b float64) float64 {
+	return a * b
+}
+
 var Max = math.Max
 
 var Min = math.Min

@@ -3,6 +3,7 @@ package fluffy
 import "math"
 
 type VariableName string
+
 type TermName string
 
 type Clause struct {

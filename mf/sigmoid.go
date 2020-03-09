@@ -7,7 +7,7 @@ type Sigmoid struct {
 }
 
 func (f *Sigmoid) Value(x float64) float64 {
-	return 1.0 / math.Exp(-f.A*(x-f.C))
+	return 1.0 / (1.0 + math.Exp(-f.A*(x-f.C)))
 }
 
 type DSigmoid struct {
@@ -15,5 +15,5 @@ type DSigmoid struct {
 }
 
 func (f *DSigmoid) Value(x float64) float64 {
-	return 1.0/math.Exp(-f.A1*(x-f.C1)) - 1.0/math.Exp(-f.A2*(x-f.C2))
+	return 1.0/(1.0+math.Exp(-f.A1*(x-f.C1))) - 1.0/(1.0+math.Exp(-f.A2*(x-f.C2)))
 }

@@ -3,6 +3,7 @@ package fis_test
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/andviro/goldie"
@@ -11,6 +12,7 @@ import (
 	"github.com/andviro/fluffy/fis"
 	"github.com/andviro/fluffy/mf"
 	"github.com/andviro/fluffy/op"
+	"github.com/andviro/fluffy/plot"
 )
 
 func TestTSK_Tipper(t *testing.T) {
@@ -19,6 +21,8 @@ func TestTSK_Tipper(t *testing.T) {
 		Inputs: []fluffy.Variable{
 			{
 				Name: "food",
+				XMin: 0,
+				XMax: 10,
 				Terms: []fluffy.Term{
 					{
 						Name:           "delicious",
@@ -32,6 +36,8 @@ func TestTSK_Tipper(t *testing.T) {
 			},
 			{
 				Name: "service",
+				XMin: 0,
+				XMax: 10,
 				Terms: []fluffy.Term{
 					{
 						Name:           "excellent",
@@ -69,24 +75,41 @@ func TestTSK_Tipper(t *testing.T) {
 		},
 		Rules: []fluffy.Rule{
 			{
-				Weight:      1.0,
-				Antecedent:  fluffy.Or{fluffy.Clause{"food", "rancid"}, fluffy.Clause{"service", "poor"}},
-				Consequents: []fluffy.Clause{{"tip", "cheap"}},
+				Weight: 1.0,
+				Antecedent: fluffy.Or{
+					fluffy.Clause{"food", "rancid"},
+					fluffy.Clause{"service", "poor"},
+				},
+				Consequents: []fluffy.Clause{
+					{"tip", "cheap"},
+				},
 			},
 			{
-				Weight:      1.0,
-				Antecedent:  fluffy.Clause{"service", "good"},
-				Consequents: []fluffy.Clause{{"tip", "average"}},
+				Weight:     1.0,
+				Antecedent: fluffy.Clause{"service", "good"},
+				Consequents: []fluffy.Clause{
+					{"tip", "average"},
+				},
 			},
 			{
-				Weight:      1.0,
-				Antecedent:  fluffy.Or{fluffy.Clause{"food", "delicious"}, fluffy.Clause{"service", "excellent"}},
-				Consequents: []fluffy.Clause{{"tip", "generous"}},
+				Weight: 1.0,
+				Antecedent: fluffy.Or{
+					fluffy.Clause{"food", "delicious"},
+					fluffy.Clause{"service", "excellent"},
+				},
+				Consequents: []fluffy.Clause{
+					{"tip", "generous"},
+				},
 			},
 		},
 	}
 	if err := tipper.Validate(); err != nil {
 		t.Fatal(err)
+	}
+	for _, v := range tipper.Inputs {
+		if err := plot.MembershipFunctions(filepath.Join("fixtures", fmt.Sprintf("%s.png", v.Name)), v); err != nil {
+			t.Fatal(err)
+		}
 	}
 	type testCase struct {
 		Service float64
