@@ -1,6 +1,9 @@
 package fluffy
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type VariableName string
 
@@ -9,6 +12,10 @@ type TermName string
 type Clause struct {
 	Variable VariableName
 	Term     TermName
+}
+
+func (c Clause) String() string {
+	return fmt.Sprintf("%s=%s", c.Variable, c.Term)
 }
 
 func (c Clause) Evaluate(fis FIS) float64 {
