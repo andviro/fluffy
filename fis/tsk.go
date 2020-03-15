@@ -11,7 +11,7 @@ import (
 type TSK struct {
 	AndMethod op.Binary
 	OrMethod  op.Binary
-	Inputs    []fluffy.Variable
+	Inputs    []*fluffy.Variable
 	Outputs   []TSKOutput
 	Rules     []fluffy.Rule
 }
@@ -75,13 +75,13 @@ func (fis *TSK) Or(a float64, b float64) float64 {
 	return op.Max(a, b)
 }
 
-func (fis *TSK) GetInput(name fluffy.VariableName) fluffy.Variable {
+func (fis *TSK) GetInput(name fluffy.VariableName) *fluffy.Variable {
 	for _, i := range fis.Inputs {
 		if i.Name == name {
 			return i
 		}
 	}
-	return fluffy.Variable{Name: name}
+	return &fluffy.Variable{Name: name}
 }
 
 func (fis *TSK) Activate(c fluffy.Clause, w float64) {

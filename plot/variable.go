@@ -30,7 +30,7 @@ func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {
 	return graph.Render(chart.PNG, f)
 }
 
-func MembershipFunctions(fn string, src fluffy.Variable) error {
+func MembershipFunctions(fn string, src *fluffy.Variable) error {
 	graph := chart.Chart{}
 	f, err := os.Create(fn)
 	if err != nil {

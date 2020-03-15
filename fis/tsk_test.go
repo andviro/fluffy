@@ -18,7 +18,7 @@ import (
 func TestTSK_Tipper(t *testing.T) {
 	tipper := fis.TSK{
 		OrMethod: op.Probor,
-		Inputs: []fluffy.Variable{
+		Inputs: []*fluffy.Variable{
 			{
 				Name: "food",
 				XMin: 0,
