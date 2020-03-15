@@ -14,6 +14,10 @@ type Clause struct {
 	Term     TermName
 }
 
+func C(variable VariableName, term TermName) Clause {
+	return Clause{variable, term}
+}
+
 func (c Clause) String() string {
 	return fmt.Sprintf("%s=%s", c.Variable, c.Term)
 }

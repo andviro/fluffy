@@ -77,28 +77,28 @@ func TestTSK_Tipper(t *testing.T) {
 			{
 				Weight: 1.0,
 				Antecedent: fluffy.Or{
-					fluffy.Clause{"food", "rancid"},
-					fluffy.Clause{"service", "poor"},
+					fluffy.C("food", "rancid"),
+					fluffy.C("service", "poor"),
 				},
 				Consequents: []fluffy.Clause{
-					{"tip", "cheap"},
+					fluffy.C("tip", "cheap"),
 				},
 			},
 			{
 				Weight:     1.0,
-				Antecedent: fluffy.Clause{"service", "good"},
+				Antecedent: fluffy.C("service", "good"),
 				Consequents: []fluffy.Clause{
-					{"tip", "average"},
+					fluffy.C("tip", "average"),
 				},
 			},
 			{
 				Weight: 1.0,
 				Antecedent: fluffy.Or{
-					fluffy.Clause{"food", "delicious"},
-					fluffy.Clause{"service", "excellent"},
+					fluffy.C("food", "delicious"),
+					fluffy.C("service", "excellent"),
 				},
 				Consequents: []fluffy.Clause{
-					{"tip", "generous"},
+					fluffy.C("tip", "generous"),
 				},
 			},
 		},
