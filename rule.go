@@ -1,6 +1,8 @@
 package fluffy
 
 import (
+	"fmt"
+
 	"github.com/andviro/fluffy/op"
 )
 
@@ -40,4 +42,8 @@ func (r *Rule) Evaluate(fis FIS) {
 	for _, c := range r.Consequents {
 		fis.Activate(c, w*r.Weight)
 	}
+}
+
+func (r Rule) String() string {
+	return fmt.Sprintf("%s => %v", r.Antecedent, r.Consequents)
 }

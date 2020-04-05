@@ -22,6 +22,21 @@ func (v *Variable) GetTermValue(term TermName) float64 {
 	return v.termValues[term]
 }
 
+func (v *Variable) GetTermValues() map[TermName]float64 {
+	vs := make(map[TermName]float64, len(v.termValues))
+	for k, v := range v.termValues {
+		vs[k] = v
+	}
+	return vs
+}
+
+func (v *Variable) SetTermValues(src map[TermName]float64) {
+	v.termValues = make(map[TermName]float64, len(src))
+	for k, val := range src {
+		v.termValues[k] = val
+	}
+}
+
 func (v *Variable) GetValue() float64 {
 	return v.value
 }

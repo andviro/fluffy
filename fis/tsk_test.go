@@ -116,6 +116,9 @@ func TestTSK_Tipper(t *testing.T) {
 		Food    float64
 	}
 	buf := new(bytes.Buffer)
+	for _, r := range tipper.Rules {
+		fmt.Fprintf(buf, "%s\n", r)
+	}
 	for _, tc := range []testCase{{1, 2}, {3, 5}, {2, 7}, {3, 1}, {1, 3}, {8, 3}, {3, 8}} {
 		tipper.SetInput("service", tc.Service)
 		tipper.SetInput("food", tc.Food)

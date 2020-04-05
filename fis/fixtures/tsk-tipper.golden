@@ -1,3 +1,6 @@
+(food=rancid or service=poor) => [tip=cheap]
+service=good => [tip=average]
+(food=delicious or service=excellent) => [tip=generous]
 {1 2} => 5.307509
 {3 5} => 12.523788
 {2 7} => 7.476659
