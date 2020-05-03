@@ -11,8 +11,14 @@ type VariableName string
 type TermName string
 
 type Clause struct {
-	Variable VariableName
-	Term     TermName
+	Variable VariableName `yaml:"variable"`
+	Term     TermName     `yaml:"term"`
+}
+
+func (c Clause) MarshalYAML() (interface{}, error) {
+	return map[interface{}]interface{}{
+		c.Variable: c.Term,
+	}, nil
 }
 
 func C(variable VariableName, term TermName) Clause {
@@ -28,9 +34,15 @@ func (c Clause) Evaluate(fis FIS) float64 {
 	return v.GetTermValue(c.Term)
 }
 
-type Connector []Evaluator
+type Connector []Antecedent
 
 type And Connector
+
+func (a And) MarshalYAML() (interface{}, error) {
+	return struct {
+		And []Antecedent `yaml:"and"`
+	}{a}, nil
+}
 
 func (c Connector) string(symbol string) string {
 	var res []string
@@ -57,6 +69,12 @@ func (a And) String() string {
 
 type Or Connector
 
+func (a Or) MarshalYAML() (interface{}, error) {
+	return struct {
+		Or []Antecedent `yaml:"or"`
+	}{a}, nil
+}
+
 func (a Or) Evaluate(fis FIS) float64 {
 	if len(a) == 0 {
 		return math.NaN()
@@ -73,13 +91,13 @@ func (a Or) String() string {
 }
 
 type Not struct {
-	Evaluator
+	Antecedent
 }
 
 func (a Not) Evaluate(fis FIS) float64 {
-	return 1 - a.Evaluator.Evaluate(fis)
+	return 1 - a.Antecedent.Evaluate(fis)
 }
 
 func (a Not) String() string {
-	return fmt.Sprintf("not %s", a.Evaluator)
+	return fmt.Sprintf("not %s", a.Antecedent)
 }

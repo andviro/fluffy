@@ -1,9 +1,10 @@
 package fluffy
 
 type Variable struct {
-	Name       VariableName
-	Terms      []Term
-	XMin, XMax float64
+	Name  VariableName `yaml:"name"`
+	Terms []Term       `yaml:"terms"`
+	XMin  float64      `yaml:"xMin"`
+	XMax  float64      `yaml:"xMax"`
 
 	value      float64
 	termValues map[TermName]float64

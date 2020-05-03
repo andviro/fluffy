@@ -6,16 +6,23 @@ import (
 	"github.com/andviro/fluffy/op"
 )
 
+var Epsilon = 0.0001
+
+type Antecedent interface {
+	Evaluator
+	MarshalYAML() (interface{}, error)
+}
+
 type Evaluator interface {
 	Evaluate(fis FIS) float64
 }
 
 type Rule struct {
-	Weight      float64
-	AndMethod   op.Binary
-	OrMethod    op.Binary
-	Antecedent  Evaluator
-	Consequents []Clause
+	Weight      float64    `yaml:"weight"`
+	AndMethod   op.Binary  `yaml:"andMethod,omitempty"`
+	OrMethod    op.Binary  `yaml:"orMethod,omitempty"`
+	Antecedent  Antecedent `yaml:"antecedent"`
+	Consequents []Clause   `yaml:"consequents"`
 }
 
 type rule struct {
@@ -39,8 +46,10 @@ func (r rule) Or(a float64, b float64) float64 {
 
 func (r *Rule) Evaluate(fis FIS) {
 	w := r.Antecedent.Evaluate(rule{Rule: r, FIS: fis})
-	for _, c := range r.Consequents {
-		fis.Activate(c, w*r.Weight)
+	if w > Epsilon {
+		for _, c := range r.Consequents {
+			fis.Activate(c, w*r.Weight)
+		}
 	}
 }
 

@@ -38,6 +38,9 @@ func MembershipFunctions(fn string, src *fluffy.Variable) error {
 	}
 	defer f.Close()
 	xmin, xmax := src.XMin, src.XMax
+	if xmin == xmax {
+		xmin, xmax = -10.0, 10.0
+	}
 	for _, v := range src.Terms {
 		s := chart.ContinuousSeries{
 			Name: string(v.Name),

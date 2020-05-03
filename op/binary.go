@@ -2,9 +2,19 @@ package op
 
 import (
 	"math"
+	"reflect"
+	"runtime"
 )
 
 type Binary func(float64, float64) float64
+
+func (b Binary) MarshalYAML() (interface{}, error) {
+	return runtime.FuncForPC(reflect.ValueOf(b).Pointer()).Name(), nil
+}
+
+func (b Binary) IsZero() bool {
+	return b == nil
+}
 
 func Nilmax(a float64, b float64) float64 {
 	if a+b < 1 {

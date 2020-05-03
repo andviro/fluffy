@@ -9,17 +9,18 @@ import (
 )
 
 type TSK struct {
-	AndMethod op.Binary
-	OrMethod  op.Binary
+	AndMethod op.Binary `yaml:"andMethod,omitempty"`
+	OrMethod  op.Binary `yaml:"orMethod,omitempty"`
 	Inputs    []*fluffy.Variable
 	Outputs   []TSKOutput
 	Rules     []fluffy.Rule
 }
 
 type TSKOutput struct {
-	Name        fluffy.VariableName
-	Terms       []TSKTerm
-	evaluations []wz
+	Name         fluffy.VariableName `yaml:"name"`
+	Terms        []TSKTerm           `yaml:"terms"`
+	DefaultValue float64             `yaml:"defaultValue"`
+	evaluations  []wz
 }
 
 type wz struct {
@@ -27,7 +28,7 @@ type wz struct {
 }
 
 type TSKTerm struct {
-	Name   fluffy.TermName
+	Name   fluffy.TermName `yaml:"name"`
 	Coeffs []float64
 	z      float64
 }
@@ -41,13 +42,13 @@ func (t *TSKTerm) Evaluate(fis *TSK) {
 }
 
 func (v TSKOutput) GetValue() float64 {
+	if len(v.evaluations) == 0 {
+		return v.DefaultValue
+	}
 	num, denom := 0.0, 0.0
 	for _, wz := range v.evaluations {
 		denom += wz.w
 		num += wz.w * wz.z
-	}
-	if denom == 0 {
-		return math.NaN()
 	}
 	return num / denom
 }
