@@ -1,0 +1,12 @@
+module github.com/andviro/fluffy
+
+go 1.16
+
+require (
+	github.com/andviro/goldie v0.0.0-20180822203610-4d8717fa0de8
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/wcharczuk/go-chart v1.1.0
+	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb // indirect
+	gopkg.in/yaml.v2 v2.4.0
+)
