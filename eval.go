@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/shopspring/decimal"
+	"github.com/andviro/fluffy/num"
+	"github.com/robaho/fixed"
 )
 
 type VariableName string
@@ -30,7 +31,7 @@ func (c Clause) String() string {
 	return fmt.Sprintf("%s=%s", c.Variable, c.Term)
 }
 
-func (c Clause) Evaluate(fis FIS) decimal.Decimal {
+func (c Clause) Evaluate(fis FIS) num.Num {
 	v := fis.GetInput(c.Variable)
 	return v.GetTermValue(c.Term)
 }
@@ -53,9 +54,9 @@ func (c Connector) string(symbol string) string {
 	return fmt.Sprintf("(%s)", strings.Join(res, symbol))
 }
 
-func (a And) Evaluate(fis FIS) decimal.Decimal {
+func (a And) Evaluate(fis FIS) num.Num {
 	if len(a) == 0 {
-		return decimal.Zero
+		return num.NaN
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -76,9 +77,9 @@ func (a Or) MarshalYAML() (interface{}, error) {
 	}{a}, nil
 }
 
-func (a Or) Evaluate(fis FIS) decimal.Decimal {
+func (a Or) Evaluate(fis FIS) num.Num {
 	if len(a) == 0 {
-		return decimal.Zero
+		return num.ZERO
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -95,9 +96,9 @@ type Not struct {
 	Antecedent
 }
 
-var one = decimal.NewFromInt(1)
+var one = fixed.NewI(1, 0)
 
-func (a Not) Evaluate(fis FIS) decimal.Decimal {
+func (a Not) Evaluate(fis FIS) num.Num {
 	return one.Sub(a.Antecedent.Evaluate(fis))
 }
 

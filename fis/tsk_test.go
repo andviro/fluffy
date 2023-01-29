@@ -7,52 +7,52 @@ import (
 	"testing"
 
 	"github.com/andviro/goldie"
-	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v2"
 
 	"github.com/andviro/fluffy"
 	"github.com/andviro/fluffy/fis"
 	"github.com/andviro/fluffy/mf"
+	"github.com/andviro/fluffy/num"
 	"github.com/andviro/fluffy/op"
 	"github.com/andviro/fluffy/plot"
 )
 
-var one = decimal.NewFromInt(1)
+var one = num.NewF(1)
 
 var tipper = fis.TSK{
 	OrMethod: op.Probor,
 	Inputs: []*fluffy.Variable{
 		{
 			Name: "food",
-			XMin: decimal.Zero,
-			XMax: decimal.NewFromInt(10),
+			XMin: num.ZERO,
+			XMax: num.NewF(10),
 			Terms: []fluffy.Term{
 				{
 					Name:           "delicious",
-					MembershipFunc: mf.RightLinear{A: decimal.NewFromInt(7), B: decimal.NewFromInt(9)},
+					MembershipFunc: mf.RightLinear{A: num.NewF(7), B: num.NewF(9)},
 				},
 				{
 					Name:           "rancid",
-					MembershipFunc: mf.LeftLinear{A: one, B: decimal.NewFromInt(3)},
+					MembershipFunc: mf.LeftLinear{A: one, B: num.NewF(3)},
 				},
 			},
 		},
 		{
 			Name: "service",
-			XMin: decimal.Zero,
-			XMax: decimal.NewFromInt(10),
+			XMin: num.ZERO,
+			XMax: num.NewF(10),
 			Terms: []fluffy.Term{
 				{
 					Name:           "excellent",
-					MembershipFunc: mf.RightGaussian{C: decimal.NewFromFloat(10.0), Sigma: decimal.NewFromFloat(1.5)},
+					MembershipFunc: mf.RightGaussian{C: num.NewF(10.0), Sigma: num.NewF(1.5)},
 				},
 				{
 					Name:           "good",
-					MembershipFunc: mf.Gaussian{C: decimal.NewFromFloat(5.0), Sigma: decimal.NewFromFloat(1.5)},
+					MembershipFunc: mf.Gaussian{C: num.NewF(5.0), Sigma: num.NewF(1.5)},
 				},
 				{
 					Name:           "poor",
-					MembershipFunc: mf.LeftGaussian{C: decimal.Zero, Sigma: decimal.NewFromFloat(1.5)},
+					MembershipFunc: mf.LeftGaussian{C: num.ZERO, Sigma: num.NewF(1.5)},
 				},
 			},
 		},
@@ -63,15 +63,15 @@ var tipper = fis.TSK{
 			Terms: []fis.TSKTerm{
 				{
 					Name:   "average",
-					Coeffs: []decimal.Decimal{decimal.NewFromInt(15)},
+					Coeffs: []num.Num{num.NewF(15)},
 				},
 				{
 					Name:   "cheap",
-					Coeffs: []decimal.Decimal{decimal.NewFromInt(5)},
+					Coeffs: []num.Num{num.NewF(5)},
 				},
 				{
 					Name:   "generous",
-					Coeffs: []decimal.Decimal{decimal.NewFromInt(25)},
+					Coeffs: []num.Num{num.NewF(25)},
 				},
 			},
 		},
@@ -125,8 +125,8 @@ func TestTSK_Tipper(t *testing.T) {
 		fmt.Fprintf(buf, "%s\n", r)
 	}
 	for _, tc := range []testCase{{1, 2}, {3, 5}, {2, 7}, {3, 1}, {1, 3}, {8, 3}, {3, 8}} {
-		tipper.SetInput("service", decimal.NewFromFloat(tc.Service))
-		tipper.SetInput("food", decimal.NewFromFloat(tc.Food))
+		tipper.SetInput("service", num.NewF(tc.Service))
+		tipper.SetInput("food", num.NewF(tc.Food))
 		tipper.Evaluate()
 		fmt.Fprintf(buf, "%v => %v\n", tc, tipper.GetOutput("tip"))
 	}

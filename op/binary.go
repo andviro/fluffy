@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"runtime"
 
-	"github.com/shopspring/decimal"
+	"github.com/andviro/fluffy/num"
 )
 
-type Binary func(decimal.Decimal, decimal.Decimal) decimal.Decimal
+type Binary func(num.Num, num.Num) num.Num
 
 func (b Binary) MarshalYAML() (interface{}, error) {
 	return runtime.FuncForPC(reflect.ValueOf(b).Pointer()).Name(), nil
@@ -18,28 +18,28 @@ func (b Binary) IsZero() bool {
 }
 
 var (
-	one = decimal.NewFromInt(1)
-	two = decimal.NewFromInt(2)
+	one = num.NewI(1, 0)
+	two = num.NewI(2, 0)
 )
 
-func Nilmax(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Nilmax(a num.Num, b num.Num) num.Num {
 	if a.Add(b).LessThan(one) {
-		return decimal.Max(a, b)
+		return num.Max(a, b)
 	}
 	return one
 }
 
-func Hsum(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Hsum(a num.Num, b num.Num) num.Num {
 	// return (a + b - (2 * a * b)) / (1 - (a * b))
 	return (a.Add(b).Sub(two.Mul(a).Mul(b))).Div(one.Sub(a.Mul(b)))
 }
 
-func Esum(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Esum(a num.Num, b num.Num) num.Num {
 	// return (a + b) / (1 + a*b)
 	return a.Add(b).Div(one.Add(a.Mul(b)))
 }
 
-func Drs(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Drs(a num.Num, b num.Num) num.Num {
 	switch {
 	case a.IsZero():
 		return b
@@ -49,19 +49,19 @@ func Drs(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
 	return one
 }
 
-func Bsum(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
-	return decimal.Min(one, a.Add(b))
+func Bsum(a num.Num, b num.Num) num.Num {
+	return num.Min(one, a.Add(b))
 }
 
-func Probor(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Probor(a num.Num, b num.Num) num.Num {
 	// return a + b - (a * b)
 	return a.Add(b).Sub(a.Mul(b))
 }
 
-func Mul(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func Mul(a num.Num, b num.Num) num.Num {
 	return a.Mul(b)
 }
 
-var Max = decimal.Max
+var Max = num.Max
 
-var Min = decimal.Min
+var Min = num.Min

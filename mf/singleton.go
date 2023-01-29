@@ -1,21 +1,23 @@
 package mf
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/andviro/fluffy/num"
+)
 
 type Singleton struct {
-	A decimal.Decimal
+	A num.Num
 }
 
 func (f Singleton) MarshalYAML() (interface{}, error) {
 	return struct {
-		Type string          `yaml:"type"`
-		A    decimal.Decimal `yaml:"a"`
+		Type string  `yaml:"type"`
+		A    num.Num `yaml:"a"`
 	}{"Singleton", f.A}, nil
 }
 
-func (f *Singleton) Value(x decimal.Decimal) decimal.Decimal {
+func (f *Singleton) Value(x num.Num) num.Num {
 	if x.Equal(f.A) {
 		return one
 	}
-	return decimal.Zero
+	return num.ZERO
 }

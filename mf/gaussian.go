@@ -1,44 +1,41 @@
 package mf
 
 import (
-	"fmt"
-
-	"github.com/shopspring/decimal"
+	"github.com/andviro/fluffy/num"
 )
 
 var (
-	one = decimal.NewFromInt(1)
-	two = decimal.NewFromInt(2)
+	one = num.NewI(1, 0)
+	two = num.NewI(2, 0)
 )
 
 type Gaussian struct {
-	C     decimal.Decimal
-	Sigma decimal.Decimal
+	C     num.Num
+	Sigma num.Num
 }
 
 type gaussianDTO struct {
-	Type  string          `yaml:"type"`
-	C     decimal.Decimal `yaml:"c"`
-	Sigma decimal.Decimal `yaml:"sigma"`
+	Type  string  `yaml:"type"`
+	C     num.Num `yaml:"c"`
+	Sigma num.Num `yaml:"sigma"`
 }
 
 func (f Gaussian) MarshalYAML() (interface{}, error) {
 	return gaussianDTO{Type: "Gaussian", C: f.C, Sigma: f.Sigma}, nil
 }
 
-func (f Gaussian) Value(x decimal.Decimal) decimal.Decimal {
+func (f Gaussian) Value(x num.Num) num.Num {
 	// return math.Exp(-math.Pow(x-f.C, 2) / (2 * math.Pow(f.Sigma, 2)))
-	fmt.Println("###", x, f.C, f.Sigma)
 	t := x.Sub(f.C)
-	t = t.Mul(t).Neg()
-	t, _ = t.ExpHullAbrham(20)
+	t = num.ZERO.Sub(t.Mul(t))
+	t = num.Exp(t)
 	t = t.Div(f.Sigma.Mul(f.Sigma).Mul(two))
 	return t
 }
 
 type LeftGaussian Gaussian
 
-func (f LeftGaussian) Value(x decimal.Decimal) decimal.Decimal {
+func (f LeftGaussian) Value(x num.Num) num.Num {
 	if x.LessThanOrEqual(f.C) {
 		return one
 	}
@@ -52,7 +49,7 @@ func (f LeftGaussian) MarshalYAML() (interface{}, error) {
 
 type RightGaussian Gaussian
 
-func (f RightGaussian) Value(x decimal.Decimal) decimal.Decimal {
+func (f RightGaussian) Value(x num.Num) num.Num {
 	if x.GreaterThanOrEqual(f.C) {
 		return one
 	}

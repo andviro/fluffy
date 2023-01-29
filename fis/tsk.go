@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/andviro/fluffy"
+	"github.com/andviro/fluffy/num"
 	"github.com/andviro/fluffy/op"
-	"github.com/shopspring/decimal"
 )
 
 type TSK struct {
@@ -19,18 +19,18 @@ type TSK struct {
 type TSKOutput struct {
 	Name         fluffy.VariableName `yaml:"name"`
 	Terms        []TSKTerm           `yaml:"terms"`
-	DefaultValue decimal.Decimal     `yaml:"defaultValue"`
+	DefaultValue num.Num             `yaml:"defaultValue"`
 	evaluations  []wz
 }
 
 type wz struct {
-	w, z decimal.Decimal
+	w, z num.Num
 }
 
 type TSKTerm struct {
 	Name   fluffy.TermName `yaml:"name"`
-	Coeffs []decimal.Decimal
-	z      decimal.Decimal
+	Coeffs []num.Num
+	z      num.Num
 }
 
 func (t *TSKTerm) Evaluate(fis *TSK) {
@@ -41,11 +41,11 @@ func (t *TSKTerm) Evaluate(fis *TSK) {
 	t.z = res
 }
 
-func (v TSKOutput) GetValue() decimal.Decimal {
+func (v TSKOutput) GetValue() num.Num {
 	if len(v.evaluations) == 0 {
 		return v.DefaultValue
 	}
-	num, denom := decimal.Zero, decimal.Zero
+	num, denom := num.ZERO, num.ZERO
 	for _, wz := range v.evaluations {
 		denom = denom.Add(wz.w)
 		num = num.Add(wz.w.Mul(wz.z))
@@ -62,14 +62,14 @@ func (v *TSKOutput) reset(fis *TSK) {
 
 var _ fluffy.FIS = (*TSK)(nil)
 
-func (fis *TSK) And(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func (fis *TSK) And(a num.Num, b num.Num) num.Num {
 	if fis.AndMethod != nil {
 		return fis.AndMethod(a, b)
 	}
 	return op.Min(a, b)
 }
 
-func (fis *TSK) Or(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func (fis *TSK) Or(a num.Num, b num.Num) num.Num {
 	if fis.OrMethod != nil {
 		return fis.OrMethod(a, b)
 	}
@@ -85,7 +85,7 @@ func (fis *TSK) GetInput(name fluffy.VariableName) *fluffy.Variable {
 	return &fluffy.Variable{Name: name}
 }
 
-func (fis *TSK) Activate(c fluffy.Clause, w decimal.Decimal) {
+func (fis *TSK) Activate(c fluffy.Clause, w num.Num) {
 	for i, o := range fis.Outputs {
 		if o.Name == c.Variable {
 			for _, t := range o.Terms {
@@ -117,7 +117,7 @@ func (fis *TSK) Evaluate() {
 	}
 }
 
-func (fis *TSK) SetInput(name fluffy.VariableName, value decimal.Decimal) {
+func (fis *TSK) SetInput(name fluffy.VariableName, value num.Num) {
 	for i := range fis.Inputs {
 		if fis.Inputs[i].Name == name {
 			fis.Inputs[i].SetValue(value)
@@ -126,11 +126,11 @@ func (fis *TSK) SetInput(name fluffy.VariableName, value decimal.Decimal) {
 	}
 }
 
-func (fis *TSK) GetOutput(name fluffy.VariableName) decimal.Decimal {
+func (fis *TSK) GetOutput(name fluffy.VariableName) num.Num {
 	for _, i := range fis.Outputs {
 		if i.Name == name {
 			return i.GetValue()
 		}
 	}
-	return decimal.Zero
+	return num.NaN
 }

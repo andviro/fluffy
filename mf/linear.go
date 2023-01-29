@@ -1,27 +1,29 @@
 package mf
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/andviro/fluffy/num"
+)
 
 type LeftLinear struct {
-	A, B decimal.Decimal
+	A, B num.Num
 }
 
 type linearDTO struct {
-	Type string          `yaml:"type"`
-	A    decimal.Decimal `yaml:"a"`
-	B    decimal.Decimal `yaml:"b"`
+	Type string  `yaml:"type"`
+	A    num.Num `yaml:"a"`
+	B    num.Num `yaml:"b"`
 }
 
 func (l LeftLinear) MarshalYAML() (interface{}, error) {
 	return linearDTO{Type: "LeftLinear", A: l.A, B: l.B}, nil
 }
 
-func (f LeftLinear) Value(x decimal.Decimal) decimal.Decimal {
+func (f LeftLinear) Value(x num.Num) num.Num {
 	switch {
 	case x.LessThanOrEqual(f.A):
 		return one
 	case x.GreaterThanOrEqual(f.B):
-		return decimal.Zero
+		return num.ZERO
 	}
 	return f.B.Sub(x).Div(f.B.Sub(f.A))
 }
@@ -32,10 +34,10 @@ func (l RightLinear) MarshalYAML() (interface{}, error) {
 	return linearDTO{Type: "RightLinear", A: l.A, B: l.B}, nil
 }
 
-func (f RightLinear) Value(x decimal.Decimal) decimal.Decimal {
+func (f RightLinear) Value(x num.Num) num.Num {
 	switch {
 	case x.LessThanOrEqual(f.A):
-		return decimal.Zero
+		return num.ZERO
 	case x.GreaterThanOrEqual(f.B):
 		return one
 	}

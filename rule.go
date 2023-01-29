@@ -3,8 +3,8 @@ package fluffy
 import (
 	"fmt"
 
+	"github.com/andviro/fluffy/num"
 	"github.com/andviro/fluffy/op"
-	"github.com/shopspring/decimal"
 )
 
 var Epsilon = 0.0001
@@ -15,15 +15,15 @@ type Antecedent interface {
 }
 
 type Evaluator interface {
-	Evaluate(fis FIS) decimal.Decimal
+	Evaluate(fis FIS) num.Num
 }
 
 type Rule struct {
-	Weight      decimal.Decimal `yaml:"weight"`
-	AndMethod   op.Binary       `yaml:"andMethod,omitempty"`
-	OrMethod    op.Binary       `yaml:"orMethod,omitempty"`
-	Antecedent  Antecedent      `yaml:"antecedent"`
-	Consequents []Clause        `yaml:"consequents"`
+	Weight      num.Num    `yaml:"weight"`
+	AndMethod   op.Binary  `yaml:"andMethod,omitempty"`
+	OrMethod    op.Binary  `yaml:"orMethod,omitempty"`
+	Antecedent  Antecedent `yaml:"antecedent"`
+	Consequents []Clause   `yaml:"consequents"`
 }
 
 type rule struct {
@@ -31,14 +31,14 @@ type rule struct {
 	FIS
 }
 
-func (r rule) And(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func (r rule) And(a num.Num, b num.Num) num.Num {
 	if r.AndMethod != nil {
 		return r.AndMethod(a, b)
 	}
 	return r.FIS.And(a, b)
 }
 
-func (r rule) Or(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+func (r rule) Or(a num.Num, b num.Num) num.Num {
 	if r.OrMethod != nil {
 		return r.OrMethod(a, b)
 	}
