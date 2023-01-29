@@ -1,29 +1,31 @@
 package mf
 
+import "github.com/shopspring/decimal"
+
 type Trapezoid struct {
-	A, B, C, D float64
+	A, B, C, D decimal.Decimal
 }
 
 func (f Trapezoid) MarshalYAML() (interface{}, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    float64 `yaml:"a"`
-		B    float64 `yaml:"b"`
-		C    float64 `yaml:"c"`
-		D    float64 `yaml:"d"`
+		Type string          `yaml:"type"`
+		A    decimal.Decimal `yaml:"a"`
+		B    decimal.Decimal `yaml:"b"`
+		C    decimal.Decimal `yaml:"c"`
+		D    decimal.Decimal `yaml:"d"`
 	}{"Trapezoid", f.A, f.B, f.C, f.D}, nil
 }
 
-func (f *Trapezoid) Value(x float64) float64 {
+func (f *Trapezoid) Value(x decimal.Decimal) decimal.Decimal {
 	switch {
-	case x >= f.B && x <= f.C:
-		return 1.0
-	case x <= f.A:
-		return 0.0
-	case x >= f.D:
-		return 0.0
-	case x < f.B:
-		return (x - f.A) / (f.B - f.A)
+	case x.GreaterThanOrEqual(f.B) && x.LessThanOrEqual(f.C):
+		return one
+	case x.LessThanOrEqual(f.A):
+		return decimal.Zero
+	case x.GreaterThanOrEqual(f.D):
+		return decimal.Zero
+	case x.LessThan(f.B):
+		return x.Sub(f.A).Div(f.B.Sub(f.A))
 	}
-	return (f.D - x) / (f.D - f.C)
+	return f.D.Sub(x).Div(f.D.Sub(f.C))
 }

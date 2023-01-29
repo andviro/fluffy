@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/andviro/fluffy/op"
+	"github.com/shopspring/decimal"
 )
 
 var Epsilon = 0.0001
@@ -14,15 +15,15 @@ type Antecedent interface {
 }
 
 type Evaluator interface {
-	Evaluate(fis FIS) float64
+	Evaluate(fis FIS) decimal.Decimal
 }
 
 type Rule struct {
-	Weight      float64    `yaml:"weight"`
-	AndMethod   op.Binary  `yaml:"andMethod,omitempty"`
-	OrMethod    op.Binary  `yaml:"orMethod,omitempty"`
-	Antecedent  Antecedent `yaml:"antecedent"`
-	Consequents []Clause   `yaml:"consequents"`
+	Weight      decimal.Decimal `yaml:"weight"`
+	AndMethod   op.Binary       `yaml:"andMethod,omitempty"`
+	OrMethod    op.Binary       `yaml:"orMethod,omitempty"`
+	Antecedent  Antecedent      `yaml:"antecedent"`
+	Consequents []Clause        `yaml:"consequents"`
 }
 
 type rule struct {
@@ -30,14 +31,14 @@ type rule struct {
 	FIS
 }
 
-func (r rule) And(a float64, b float64) float64 {
+func (r rule) And(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
 	if r.AndMethod != nil {
 		return r.AndMethod(a, b)
 	}
 	return r.FIS.And(a, b)
 }
 
-func (r rule) Or(a float64, b float64) float64 {
+func (r rule) Or(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
 	if r.OrMethod != nil {
 		return r.OrMethod(a, b)
 	}
@@ -46,9 +47,9 @@ func (r rule) Or(a float64, b float64) float64 {
 
 func (r *Rule) Evaluate(fis FIS) {
 	w := r.Antecedent.Evaluate(rule{Rule: r, FIS: fis})
-	if w > Epsilon {
+	if !w.IsZero() {
 		for _, c := range r.Consequents {
-			fis.Activate(c, w*r.Weight)
+			fis.Activate(c, w.Mul(r.Weight))
 		}
 	}
 }

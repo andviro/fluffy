@@ -1,11 +1,11 @@
 package fluffy
 
 import (
-	"math"
+	"github.com/shopspring/decimal"
 )
 
 type MembershipFunc interface {
-	Value(x float64) float64
+	Value(x decimal.Decimal) decimal.Decimal
 	MarshalYAML() (interface{}, error)
 }
 
@@ -14,9 +14,9 @@ type Term struct {
 	MembershipFunc MembershipFunc `yaml:"mf"`
 }
 
-func (t *Term) MembershipValue(x float64) float64 {
-	if t.MembershipFunc != nil {
-		return t.MembershipFunc.Value(x)
+func (t *Term) MembershipValue(x decimal.Decimal) decimal.Decimal {
+	if t.MembershipFunc == nil {
+		return decimal.Zero
 	}
-	return math.NaN()
+	return t.MembershipFunc.Value(x)
 }

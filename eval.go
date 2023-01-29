@@ -2,8 +2,9 @@ package fluffy
 
 import (
 	"fmt"
-	"math"
 	"strings"
+
+	"github.com/shopspring/decimal"
 )
 
 type VariableName string
@@ -29,7 +30,7 @@ func (c Clause) String() string {
 	return fmt.Sprintf("%s=%s", c.Variable, c.Term)
 }
 
-func (c Clause) Evaluate(fis FIS) float64 {
+func (c Clause) Evaluate(fis FIS) decimal.Decimal {
 	v := fis.GetInput(c.Variable)
 	return v.GetTermValue(c.Term)
 }
@@ -52,9 +53,9 @@ func (c Connector) string(symbol string) string {
 	return fmt.Sprintf("(%s)", strings.Join(res, symbol))
 }
 
-func (a And) Evaluate(fis FIS) float64 {
+func (a And) Evaluate(fis FIS) decimal.Decimal {
 	if len(a) == 0 {
-		return math.NaN()
+		return decimal.Zero
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -75,9 +76,9 @@ func (a Or) MarshalYAML() (interface{}, error) {
 	}{a}, nil
 }
 
-func (a Or) Evaluate(fis FIS) float64 {
+func (a Or) Evaluate(fis FIS) decimal.Decimal {
 	if len(a) == 0 {
-		return math.NaN()
+		return decimal.Zero
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -94,8 +95,10 @@ type Not struct {
 	Antecedent
 }
 
-func (a Not) Evaluate(fis FIS) float64 {
-	return 1 - a.Antecedent.Evaluate(fis)
+var one = decimal.NewFromInt(1)
+
+func (a Not) Evaluate(fis FIS) decimal.Decimal {
+	return one.Sub(a.Antecedent.Evaluate(fis))
 }
 
 func (a Not) String() string {

@@ -1,27 +1,29 @@
 package mf
 
+import "github.com/shopspring/decimal"
+
 type LeftLinear struct {
-	A, B float64
+	A, B decimal.Decimal
 }
 
 type linearDTO struct {
-	Type string  `yaml:"type"`
-	A    float64 `yaml:"a"`
-	B    float64 `yaml:"b"`
+	Type string          `yaml:"type"`
+	A    decimal.Decimal `yaml:"a"`
+	B    decimal.Decimal `yaml:"b"`
 }
 
 func (l LeftLinear) MarshalYAML() (interface{}, error) {
 	return linearDTO{Type: "LeftLinear", A: l.A, B: l.B}, nil
 }
 
-func (f LeftLinear) Value(x float64) float64 {
+func (f LeftLinear) Value(x decimal.Decimal) decimal.Decimal {
 	switch {
-	case x <= f.A:
-		return 1.0
-	case x >= f.B:
-		return 0.0
+	case x.LessThanOrEqual(f.A):
+		return one
+	case x.GreaterThanOrEqual(f.B):
+		return decimal.Zero
 	}
-	return (f.B - x) / (f.B - f.A)
+	return f.B.Sub(x).Div(f.B.Sub(f.A))
 }
 
 type RightLinear LeftLinear
@@ -30,12 +32,12 @@ func (l RightLinear) MarshalYAML() (interface{}, error) {
 	return linearDTO{Type: "RightLinear", A: l.A, B: l.B}, nil
 }
 
-func (f RightLinear) Value(x float64) float64 {
+func (f RightLinear) Value(x decimal.Decimal) decimal.Decimal {
 	switch {
-	case x <= f.A:
-		return 0.0
-	case x >= f.B:
-		return 1.0
+	case x.LessThanOrEqual(f.A):
+		return decimal.Zero
+	case x.GreaterThanOrEqual(f.B):
+		return one
 	}
-	return (x - f.A) / (f.B - f.A)
+	return x.Sub(f.A).Div(f.B.Sub(f.A))
 }

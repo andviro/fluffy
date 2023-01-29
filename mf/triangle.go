@@ -1,28 +1,30 @@
 package mf
 
+import "github.com/shopspring/decimal"
+
 type Triangle struct {
-	A, B, C float64
+	A, B, C decimal.Decimal
 }
 
 func (f Triangle) MarshalYAML() (interface{}, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    float64 `yaml:"a"`
-		B    float64 `yaml:"b"`
-		C    float64 `yaml:"c"`
+		Type string          `yaml:"type"`
+		A    decimal.Decimal `yaml:"a"`
+		B    decimal.Decimal `yaml:"b"`
+		C    decimal.Decimal `yaml:"c"`
 	}{"Triangle", f.A, f.B, f.C}, nil
 }
 
-func (f Triangle) Value(x float64) float64 {
+func (f Triangle) Value(x decimal.Decimal) decimal.Decimal {
 	switch {
-	case x == f.B:
-		return 1.0
-	case x <= f.A:
-		return 0.0
-	case x >= f.C:
-		return 0.0
-	case x < f.B:
-		return (x - f.A) / (f.B - f.A)
+	case x.Equal(f.B):
+		return one
+	case x.LessThan(f.A):
+		return decimal.Zero
+	case x.GreaterThanOrEqual(f.C):
+		return decimal.Zero
+	case x.LessThanOrEqual(f.B):
+		return x.Sub(f.A).Div(f.B.Sub(f.A))
 	}
-	return (f.C - x) / (f.C - f.B)
+	return f.C.Sub(x).Div(f.C.Sub(f.B))
 }

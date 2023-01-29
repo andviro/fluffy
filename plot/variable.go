@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/shopspring/decimal"
 	"github.com/wcharczuk/go-chart/v2"
 
 	"github.com/andviro/fluffy"
@@ -22,7 +23,7 @@ func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {
 		}
 		for x := xmin; x <= xmax; x += (xmax - xmin) / 100.0 {
 			s.XValues = append(s.XValues, x)
-			s.YValues = append(s.YValues, v.MembershipValue(x))
+			s.YValues = append(s.YValues, v.MembershipValue(decimal.NewFromFloat(x)).InexactFloat64())
 		}
 		graph.Series = append(graph.Series, s)
 	}
@@ -37,7 +38,7 @@ func MembershipFunctions(fn string, src *fluffy.Variable) error {
 		return fmt.Errorf("creating output file: %w", err)
 	}
 	defer f.Close()
-	xmin, xmax := src.XMin, src.XMax
+	xmin, xmax := src.XMin.InexactFloat64(), src.XMax.InexactFloat64()
 	if xmin == xmax {
 		xmin, xmax = -10.0, 10.0
 	}
@@ -47,7 +48,7 @@ func MembershipFunctions(fn string, src *fluffy.Variable) error {
 		}
 		for x := xmin; x <= xmax; x += (xmax - xmin) / 100.0 {
 			s.XValues = append(s.XValues, x)
-			s.YValues = append(s.YValues, v.MembershipValue(x))
+			s.YValues = append(s.YValues, v.MembershipValue(decimal.NewFromFloat(x)).InexactFloat64())
 		}
 		graph.Series = append(graph.Series, s)
 	}

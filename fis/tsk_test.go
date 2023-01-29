@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/andviro/goldie"
+	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v2"
 
 	"github.com/andviro/fluffy"
@@ -16,40 +17,42 @@ import (
 	"github.com/andviro/fluffy/plot"
 )
 
+var one = decimal.NewFromInt(1)
+
 var tipper = fis.TSK{
 	OrMethod: op.Probor,
 	Inputs: []*fluffy.Variable{
 		{
 			Name: "food",
-			XMin: 0,
-			XMax: 10,
+			XMin: decimal.Zero,
+			XMax: decimal.NewFromInt(10),
 			Terms: []fluffy.Term{
 				{
 					Name:           "delicious",
-					MembershipFunc: mf.RightLinear{A: 7, B: 9},
+					MembershipFunc: mf.RightLinear{A: decimal.NewFromInt(7), B: decimal.NewFromInt(9)},
 				},
 				{
 					Name:           "rancid",
-					MembershipFunc: mf.LeftLinear{A: 1, B: 3},
+					MembershipFunc: mf.LeftLinear{A: one, B: decimal.NewFromInt(3)},
 				},
 			},
 		},
 		{
 			Name: "service",
-			XMin: 0,
-			XMax: 10,
+			XMin: decimal.Zero,
+			XMax: decimal.NewFromInt(10),
 			Terms: []fluffy.Term{
 				{
 					Name:           "excellent",
-					MembershipFunc: mf.RightGaussian{C: 10.0, Sigma: 1.5},
+					MembershipFunc: mf.RightGaussian{C: decimal.NewFromFloat(10.0), Sigma: decimal.NewFromFloat(1.5)},
 				},
 				{
 					Name:           "good",
-					MembershipFunc: mf.Gaussian{C: 5.0, Sigma: 1.5},
+					MembershipFunc: mf.Gaussian{C: decimal.NewFromFloat(5.0), Sigma: decimal.NewFromFloat(1.5)},
 				},
 				{
 					Name:           "poor",
-					MembershipFunc: mf.LeftGaussian{C: 0.0, Sigma: 1.5},
+					MembershipFunc: mf.LeftGaussian{C: decimal.Zero, Sigma: decimal.NewFromFloat(1.5)},
 				},
 			},
 		},
@@ -60,22 +63,22 @@ var tipper = fis.TSK{
 			Terms: []fis.TSKTerm{
 				{
 					Name:   "average",
-					Coeffs: []float64{15},
+					Coeffs: []decimal.Decimal{decimal.NewFromInt(15)},
 				},
 				{
 					Name:   "cheap",
-					Coeffs: []float64{5},
+					Coeffs: []decimal.Decimal{decimal.NewFromInt(5)},
 				},
 				{
 					Name:   "generous",
-					Coeffs: []float64{25},
+					Coeffs: []decimal.Decimal{decimal.NewFromInt(25)},
 				},
 			},
 		},
 	},
 	Rules: []fluffy.Rule{
 		{
-			Weight: 1.0,
+			Weight: one,
 			Antecedent: fluffy.Or{
 				fluffy.C("food", "rancid"),
 				fluffy.C("service", "poor"),
@@ -85,14 +88,14 @@ var tipper = fis.TSK{
 			},
 		},
 		{
-			Weight:     1.0,
+			Weight:     one,
 			Antecedent: fluffy.C("service", "good"),
 			Consequents: []fluffy.Clause{
 				fluffy.C("tip", "average"),
 			},
 		},
 		{
-			Weight: 1.0,
+			Weight: one,
 			Antecedent: fluffy.Or{
 				fluffy.C("food", "delicious"),
 				fluffy.C("service", "excellent"),
@@ -122,10 +125,10 @@ func TestTSK_Tipper(t *testing.T) {
 		fmt.Fprintf(buf, "%s\n", r)
 	}
 	for _, tc := range []testCase{{1, 2}, {3, 5}, {2, 7}, {3, 1}, {1, 3}, {8, 3}, {3, 8}} {
-		tipper.SetInput("service", tc.Service)
-		tipper.SetInput("food", tc.Food)
+		tipper.SetInput("service", decimal.NewFromFloat(tc.Service))
+		tipper.SetInput("food", decimal.NewFromFloat(tc.Food))
 		tipper.Evaluate()
-		fmt.Fprintf(buf, "%v => %f\n", tc, tipper.GetOutput("tip"))
+		fmt.Fprintf(buf, "%v => %v\n", tc, tipper.GetOutput("tip"))
 	}
 	goldie.Assert(t, "tsk-tipper", buf.Bytes())
 }

@@ -1,19 +1,21 @@
 package mf
 
+import "github.com/shopspring/decimal"
+
 type Singleton struct {
-	A float64
+	A decimal.Decimal
 }
 
 func (f Singleton) MarshalYAML() (interface{}, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    float64 `yaml:"a"`
+		Type string          `yaml:"type"`
+		A    decimal.Decimal `yaml:"a"`
 	}{"Singleton", f.A}, nil
 }
 
-func (f *Singleton) Value(x float64) float64 {
-	if x == f.A {
-		return 1.0
+func (f *Singleton) Value(x decimal.Decimal) decimal.Decimal {
+	if x.Equal(f.A) {
+		return one
 	}
-	return 0.0
+	return decimal.Zero
 }
