@@ -12,7 +12,7 @@ var Epsilon = 0.0001
 type Antecedent interface {
 	Evaluator
 	MarshalYAML() (interface{}, error)
-	Valid(func(name VariableName) error) error
+	Valid(func(variable VariableName, term TermName) error) error
 }
 
 type Evaluator interface {

@@ -106,13 +106,18 @@ func (fis *TSK) Validate() error {
 		}
 	}
 	for _, r := range fis.Rules {
-		if err := r.Antecedent.Valid(func(name fluffy.VariableName) error {
+		if err := r.Antecedent.Valid(func(variable fluffy.VariableName, term fluffy.TermName) error {
 			for _, i := range fis.Inputs {
-				if i.Name == name {
-					return nil
+				if i.Name == variable {
+					for _, t := range i.Terms {
+						if t.Name == term {
+							return nil
+						}
+					}
+					return fmt.Errorf("term value %s not found for input %s", term, variable)
 				}
 			}
-			return fmt.Errorf("variable %s not found in inputs", name)
+			return fmt.Errorf("variable %s not found in inputs", variable)
 		}); err != nil {
 			return err
 		}
