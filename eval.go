@@ -17,6 +17,10 @@ type Clause struct {
 	Term     TermName     `yaml:"term" parser:"'=' @Ident"`
 }
 
+func (c Clause) Valid(f func(VariableName) error) error {
+	return f(c.Variable)
+}
+
 func (c Clause) MarshalYAML() (interface{}, error) {
 	return map[interface{}]interface{}{
 		c.Variable: c.Term,
@@ -38,7 +42,20 @@ func (c Clause) Evaluate(fis FIS) num.Num {
 
 type Connector []Antecedent
 
+func (a Connector) Valid(f func(VariableName) error) error {
+	for _, clause := range a {
+		if err := clause.Valid(f); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type And Connector
+
+func (a And) Valid(f func(VariableName) error) error {
+	return Connector(a).Valid(f)
+}
 
 func (a And) MarshalYAML() (interface{}, error) {
 	return struct {
@@ -70,6 +87,10 @@ func (a And) String() string {
 }
 
 type Or Connector
+
+func (a Or) Valid(f func(VariableName) error) error {
+	return Connector(a).Valid(f)
+}
 
 func (a Or) MarshalYAML() (interface{}, error) {
 	return struct {

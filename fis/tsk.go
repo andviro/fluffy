@@ -105,6 +105,30 @@ func (fis *TSK) Validate() error {
 			}
 		}
 	}
+	for _, r := range fis.Rules {
+		if err := r.Antecedent.Valid(func(name fluffy.VariableName) error {
+			for _, i := range fis.Inputs {
+				if i.Name == name {
+					return nil
+				}
+			}
+			return fmt.Errorf("variable %s not found in inputs", name)
+		}); err != nil {
+			return err
+		}
+		for _, c := range r.Consequents {
+			if err := c.Valid(func(name fluffy.VariableName) error {
+				for _, i := range fis.Outputs {
+					if i.Name == name {
+						return nil
+					}
+				}
+				return fmt.Errorf("consequent %s not found in outputs", name)
+			}); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
