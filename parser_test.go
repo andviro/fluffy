@@ -12,8 +12,8 @@ import (
 
 func TestParser(t *testing.T) {
 	r, err := fluffy.ParseRules(`
-    1.0 : a = b & c = d | a = e -> z = y
-    0.5 : x = y & (x = d | x = f) -> z = t
+    1 : a = b & c = d | a = e -> z = y
+    1.5 : x = y & (x = d | x = f) -> z = t
 `)
 	if err != nil {
 		t.Fatal(err)

@@ -10,7 +10,7 @@ type RulesParser struct {
 }
 
 type RuleParser struct {
-	Weight      string   `parser:"@Float"`
+	Weight      string   `parser:"(@Float | @Int)"`
 	Antecedent  OrParser `parser:"':' @@"`
 	Consequents []Clause `parser:" ['-' '>'] @@+"`
 }

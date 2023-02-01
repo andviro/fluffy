@@ -7,7 +7,7 @@
     - a: e
   consequents:
   - z: "y"
-- weight: 0.5
+- weight: 1.5
   antecedent:
     and:
     - x: "y"
