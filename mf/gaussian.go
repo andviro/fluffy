@@ -4,15 +4,15 @@ import (
 	"github.com/andviro/fluffy/num"
 )
 
-var (
-	one = num.NewI(1, 0)
-	two = num.NewI(2, 0)
-)
-
 type Gaussian struct {
 	C     num.Num
 	Sigma num.Num
 }
+
+var (
+	one = num.NewI(1, 0)
+	two = num.NewI(2, 0)
+)
 
 type gaussianDTO struct {
 	Type  string  `yaml:"type"`
@@ -25,12 +25,7 @@ func (f Gaussian) MarshalYAML() (interface{}, error) {
 }
 
 func (f Gaussian) Value(x num.Num) num.Num {
-	// return math.Exp(-math.Pow(x-f.C, 2) / (2 * math.Pow(f.Sigma, 2)))
-	t := x.Sub(f.C)
-	t = num.ZERO.Sub(t.Mul(t))
-	t = num.Exp(t)
-	t = t.Div(f.Sigma.Mul(f.Sigma).Mul(two))
-	return t
+	return num.Exp(num.Neg(num.Sqr(x.Sub(f.C)).Div(two.Mul(num.Sqr(f.Sigma)))))
 }
 
 type LeftGaussian Gaussian
@@ -39,7 +34,6 @@ func (f LeftGaussian) Value(x num.Num) num.Num {
 	if x.LessThanOrEqual(f.C) {
 		return one
 	}
-	// return math.Exp(-math.Pow(x-f.C, 2) / (2 * math.Pow(f.Sigma, 2)))
 	return Gaussian(f).Value(x)
 }
 

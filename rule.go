@@ -19,11 +19,27 @@ type Evaluator interface {
 }
 
 type Rule struct {
-	Weight      num.Num    `yaml:"weight"`
-	AndMethod   op.Binary  `yaml:"andMethod,omitempty"`
-	OrMethod    op.Binary  `yaml:"orMethod,omitempty"`
-	Antecedent  Antecedent `yaml:"antecedent"`
-	Consequents []Clause   `yaml:"consequents"`
+	Weight      num.Num
+	AndMethod   op.Binary
+	OrMethod    op.Binary
+	Antecedent  Antecedent
+	Consequents []Clause
+}
+
+func (r Rule) MarshalYAML() (interface{}, error) {
+	return struct {
+		Weight      float64
+		AndMethod   op.Binary  `yaml:"andMethod,omitempty"`
+		OrMethod    op.Binary  `yaml:"orMethod,omitempty"`
+		Antecedent  Antecedent `yaml:"antecedent"`
+		Consequents []Clause   `yaml:"consequents"`
+	}{
+		Weight:      r.Weight.Float(),
+		AndMethod:   r.AndMethod,
+		OrMethod:    r.OrMethod,
+		Antecedent:  r.Antecedent,
+		Consequents: r.Consequents,
+	}, nil
 }
 
 type rule struct {

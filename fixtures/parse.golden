@@ -1,0 +1,18 @@
+- weight: 1
+  antecedent:
+    or:
+    - and:
+      - a: b
+      - c: d
+    - a: e
+  consequents:
+  - z: "y"
+- weight: 0.5
+  antecedent:
+    and:
+    - x: "y"
+    - or:
+      - x: d
+      - x: f
+  consequents:
+  - z: t

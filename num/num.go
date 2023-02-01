@@ -50,3 +50,7 @@ func Exp(n Num) Num {
 func Neg(n Num) Num {
 	return ZERO.Sub(n)
 }
+
+func Sqr(val Num) Num {
+	return val.Mul(val)
+}

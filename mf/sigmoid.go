@@ -1,6 +1,8 @@
 package mf
 
 import (
+	"math"
+
 	"github.com/andviro/fluffy/num"
 )
 
@@ -14,14 +16,12 @@ type sigmoidDTO struct {
 	C    num.Num `yaml:"c"`
 }
 
-func sigmoid(x, a, c num.Num) num.Num {
-	t := num.Neg(a.Mul(x.Sub(c)))
-	t = num.Exp(t)
-	return one.Div(one.Add(t))
-}
-
 func (f Sigmoid) MarshalYAML() (interface{}, error) {
 	return sigmoidDTO{Type: "Sigmoid", C: f.C, A: f.A}, nil
+}
+
+func sigmoid(x, a, c num.Num) num.Num {
+	return num.NewF(1.0 / (1.0 + math.Exp(-a.Float()*(x.Float()-c.Float()))))
 }
 
 func (f *Sigmoid) Value(x num.Num) num.Num {

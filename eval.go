@@ -13,8 +13,8 @@ type VariableName string
 type TermName string
 
 type Clause struct {
-	Variable VariableName `yaml:"variable"`
-	Term     TermName     `yaml:"term"`
+	Variable VariableName `yaml:"variable" parser:"@Ident"`
+	Term     TermName     `yaml:"term" parser:"'=' @Ident"`
 }
 
 func (c Clause) MarshalYAML() (interface{}, error) {
