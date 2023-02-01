@@ -122,10 +122,15 @@ func (fis *TSK) Validate() error {
 			return err
 		}
 		for _, c := range r.Consequents {
-			if err := c.Valid(func(name fluffy.VariableName) error {
-				for _, i := range fis.Outputs {
-					if i.Name == name {
-						return nil
+			if err := c.Valid(func(name fluffy.VariableName, term fluffy.TermName) error {
+				for _, o := range fis.Outputs {
+					if o.Name == name {
+						for _, t := range o.Terms {
+							if t.Name == term {
+								return nil
+							}
+						}
+						return fmt.Errorf("term %s not found in consequent %s terms", term, name)
 					}
 				}
 				return fmt.Errorf("consequent %s not found in outputs", name)
