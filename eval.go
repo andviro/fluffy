@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/andviro/fluffy/num"
-	"github.com/robaho/fixed"
 )
 
 type VariableName string
@@ -117,7 +116,7 @@ type Not struct {
 	Antecedent
 }
 
-var one = fixed.NewI(1, 0)
+var one = num.NewI(1, 0)
 
 func (a Not) Evaluate(fis FIS) num.Num {
 	return one.Sub(a.Antecedent.Evaluate(fis))
