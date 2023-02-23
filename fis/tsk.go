@@ -9,11 +9,12 @@ import (
 )
 
 type TSK struct {
-	AndMethod op.Binary `yaml:"andMethod,omitempty"`
-	OrMethod  op.Binary `yaml:"orMethod,omitempty"`
-	Inputs    []*fluffy.Variable
-	Outputs   []TSKOutput
-	Rules     []fluffy.Rule
+	AndMethod      op.Binary `yaml:"andMethod,omitempty"`
+	OrMethod       op.Binary `yaml:"orMethod,omitempty"`
+	Inputs         []*fluffy.Variable
+	ExternalInputs []ExternalInput
+	Outputs        []TSKOutput
+	Rules          []fluffy.Rule
 }
 
 type TSKOutput struct {
@@ -145,6 +146,10 @@ func (fis *TSK) Validate() error {
 func (fis *TSK) Evaluate() {
 	for i := range fis.Outputs {
 		fis.Outputs[i].reset(fis)
+	}
+	for _, ei := range fis.ExternalInputs {
+		fullName := ei.Prefix + "_" + ei.Output
+		fis.SetInput(fullName, ei.FIS.GetOutput(ei.Output))
 	}
 	for _, r := range fis.Rules {
 		r.Evaluate(fis)
