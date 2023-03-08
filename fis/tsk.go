@@ -3,9 +3,9 @@ package fis
 import (
 	"fmt"
 
-	"github.com/andviro/fluffy"
-	"github.com/andviro/fluffy/num"
-	"github.com/andviro/fluffy/op"
+	"github.com/andviro/fluffy/v2"
+	"github.com/andviro/fluffy/v2/num"
+	"github.com/andviro/fluffy/v2/op"
 )
 
 type TSK struct {

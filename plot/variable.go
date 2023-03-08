@@ -6,8 +6,8 @@ import (
 
 	"github.com/wcharczuk/go-chart/v2"
 
-	"github.com/andviro/fluffy"
-	"github.com/andviro/fluffy/num"
+	"github.com/andviro/fluffy/v2"
+	"github.com/andviro/fluffy/v2/num"
 )
 
 func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {

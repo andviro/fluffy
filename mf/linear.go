@@ -1,7 +1,7 @@
 package mf
 
 import (
-	"github.com/andviro/fluffy/num"
+	"github.com/andviro/fluffy/v2/num"
 )
 
 type LeftLinear struct {

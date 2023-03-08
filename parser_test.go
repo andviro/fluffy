@@ -7,7 +7,7 @@ import (
 
 	"github.com/andviro/goldie"
 
-	"github.com/andviro/fluffy"
+	"github.com/andviro/fluffy/v2"
 )
 
 func TestParser(t *testing.T) {

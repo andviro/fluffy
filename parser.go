@@ -2,7 +2,7 @@ package fluffy
 
 import (
 	"github.com/alecthomas/participle/v2"
-	"github.com/andviro/fluffy/num"
+	"github.com/andviro/fluffy/v2/num"
 )
 
 type RulesParser struct {

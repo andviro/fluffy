@@ -1,6 +1,6 @@
 package fluffy
 
-import "github.com/andviro/fluffy/num"
+import "github.com/andviro/fluffy/v2/num"
 
 type Variable struct {
 	Name  VariableName `yaml:"name"`

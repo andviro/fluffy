@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"runtime"
 
-	"github.com/andviro/fluffy/num"
+	"github.com/andviro/fluffy/v2/num"
 )
 
 type Binary func(num.Num, num.Num) num.Num

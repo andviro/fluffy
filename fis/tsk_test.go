@@ -9,12 +9,12 @@ import (
 	"github.com/andviro/goldie"
 	"gopkg.in/yaml.v2"
 
-	"github.com/andviro/fluffy"
-	"github.com/andviro/fluffy/fis"
-	"github.com/andviro/fluffy/mf"
-	"github.com/andviro/fluffy/num"
-	"github.com/andviro/fluffy/op"
-	"github.com/andviro/fluffy/plot"
+	"github.com/andviro/fluffy/v2"
+	"github.com/andviro/fluffy/v2/fis"
+	"github.com/andviro/fluffy/v2/mf"
+	"github.com/andviro/fluffy/v2/num"
+	"github.com/andviro/fluffy/v2/op"
+	"github.com/andviro/fluffy/v2/plot"
 )
 
 var one = num.NewF(1)

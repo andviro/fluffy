@@ -3,7 +3,7 @@ package fis
 import (
 	"fmt"
 
-	"github.com/andviro/fluffy"
+	"github.com/andviro/fluffy/v2"
 )
 
 type ExternalInput struct {
