@@ -1,4 +1,4 @@
-module github.com/andviro/fluffy
+module github.com/andviro/fluffy/v2
 
 go 1.19
 
