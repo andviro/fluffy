@@ -59,6 +59,10 @@ func Sqr[T Num[T]](x T) (res T) {
 	return x.Mul(x)
 }
 
+func Neg[T Num[T]](x T) (res T) {
+	return x.Neg()
+}
+
 func NaN[T Num[T]]() (res T) {
 	return res.NaN()
 }

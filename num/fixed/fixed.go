@@ -3,6 +3,7 @@ package fixed
 import (
 	"math"
 
+	"github.com/andviro/fluffy/v2/num"
 	"github.com/robaho/fixed"
 )
 
@@ -136,3 +137,5 @@ func (f Fixed) MarshalBinary() ([]byte, error) {
 func (f *Fixed) UnmarshalBinary(bytes []byte) error {
 	return (*fixed.Fixed)(f).UnmarshalBinary(bytes)
 }
+
+var _ num.Num[Fixed] = Fixed{}

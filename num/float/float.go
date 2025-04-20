@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+
+	"github.com/andviro/fluffy/v2/num"
 )
 
 type Float float64
@@ -93,6 +95,10 @@ func (f Float) Mul(n Float) Float {
 	return Float(float64(f) * float64(n))
 }
 
+func (f Float) Neg() Float {
+	return Float(float64(f) * -1)
+}
+
 func (f Float) LessThan(n Float) bool {
 	return f < n
 }
@@ -129,3 +135,5 @@ func Neg(n Float) Float {
 func (f Float) String() string {
 	return fmt.Sprint(float64(f))
 }
+
+var _ num.Num[Float] = Float(1)
