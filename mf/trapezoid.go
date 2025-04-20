@@ -2,28 +2,28 @@ package mf
 
 import "github.com/andviro/fluffy/v2/num"
 
-type Trapezoid struct {
-	A, B, C, D num.Num
+type Trapezoid[T num.Num[T]] struct {
+	A, B, C, D T
 }
 
-func (f Trapezoid) MarshalYAML() (interface{}, error) {
+func (f Trapezoid[T]) MarshalYAML() (any, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    num.Num `yaml:"a"`
-		B    num.Num `yaml:"b"`
-		C    num.Num `yaml:"c"`
-		D    num.Num `yaml:"d"`
-	}{"Trapezoid", f.A, f.B, f.C, f.D}, nil
+		Type string `yaml:"type"`
+		A    string `yaml:"a"`
+		B    string `yaml:"b"`
+		C    string `yaml:"c"`
+		D    string `yaml:"d"`
+	}{"Trapezoid", f.A.String(), f.B.String(), f.C.String(), f.D.String()}, nil
 }
 
-func (f *Trapezoid) Value(x num.Num) num.Num {
+func (f *Trapezoid[T]) Value(x T) T {
 	switch {
 	case x.GreaterThanOrEqual(f.B) && x.LessThanOrEqual(f.C):
-		return one
+		return num.One[T]()
 	case x.LessThanOrEqual(f.A):
-		return num.ZERO
+		return num.ZERO[T]()
 	case x.GreaterThanOrEqual(f.D):
-		return num.ZERO
+		return num.ZERO[T]()
 	case x.LessThan(f.B):
 		return x.Sub(f.A).Div(f.B.Sub(f.A))
 	}

@@ -8,33 +8,33 @@ import (
 	"github.com/andviro/fluffy/v2/op"
 )
 
-type TSK struct {
-	AndMethod      op.Binary `yaml:"andMethod,omitempty"`
-	OrMethod       op.Binary `yaml:"orMethod,omitempty"`
-	Inputs         []*fluffy.Variable
-	ExternalInputs []ExternalInput
-	Outputs        []TSKOutput
-	Rules          []fluffy.Rule
+type TSK[T num.Num[T]] struct {
+	AndMethod      op.Binary[T] `yaml:"andMethod,omitempty"`
+	OrMethod       op.Binary[T] `yaml:"orMethod,omitempty"`
+	Inputs         []*fluffy.Variable[T]
+	ExternalInputs []ExternalInput[T]
+	Outputs        []TSKOutput[T]
+	Rules          []fluffy.Rule[T]
 }
 
-type TSKOutput struct {
+type TSKOutput[T num.Num[T]] struct {
 	Name         fluffy.VariableName `yaml:"name"`
-	Terms        []TSKTerm           `yaml:"terms"`
-	DefaultValue num.Num             `yaml:"defaultValue"`
-	evaluations  []wz
+	Terms        []TSKTerm[T]        `yaml:"terms"`
+	DefaultValue T                   `yaml:"defaultValue"`
+	evaluations  []wz[T]
 }
 
-type wz struct {
-	w, z num.Num
+type wz[T num.Num[T]] struct {
+	w, z T
 }
 
-type TSKTerm struct {
+type TSKTerm[T num.Num[T]] struct {
 	Name   fluffy.TermName `yaml:"name"`
-	Coeffs []num.Num
-	z      num.Num
+	Coeffs []T
+	z      T
 }
 
-func (t *TSKTerm) Evaluate(fis *TSK) {
+func (t *TSKTerm[T]) Evaluate(fis *TSK[T]) {
 	res := t.Coeffs[0]
 	for i, k := range t.Coeffs[1:] {
 		res = res.Add(k.Mul(fis.Inputs[i].GetValue()))
@@ -42,11 +42,11 @@ func (t *TSKTerm) Evaluate(fis *TSK) {
 	t.z = res
 }
 
-func (v TSKOutput) GetValue() num.Num {
+func (v TSKOutput[T]) GetValue() T {
 	if len(v.evaluations) == 0 {
 		return v.DefaultValue
 	}
-	num, denom := num.ZERO, num.ZERO
+	var num, denom T
 	for _, wz := range v.evaluations {
 		denom = denom.Add(wz.w)
 		num = num.Add(wz.w.Mul(wz.z))
@@ -54,51 +54,49 @@ func (v TSKOutput) GetValue() num.Num {
 	return num.Div(denom)
 }
 
-func (v *TSKOutput) reset(fis *TSK) {
+func (v *TSKOutput[T]) reset(fis *TSK[T]) {
 	v.evaluations = nil
 	for j := range v.Terms {
 		v.Terms[j].Evaluate(fis)
 	}
 }
 
-var _ fluffy.FIS = (*TSK)(nil)
-
-func (fis *TSK) And(a num.Num, b num.Num) num.Num {
+func (fis *TSK[T]) And(a T, b T) T {
 	if fis.AndMethod != nil {
 		return fis.AndMethod(a, b)
 	}
 	return op.Min(a, b)
 }
 
-func (fis *TSK) Or(a num.Num, b num.Num) num.Num {
+func (fis *TSK[T]) Or(a T, b T) T {
 	if fis.OrMethod != nil {
 		return fis.OrMethod(a, b)
 	}
 	return op.Max(a, b)
 }
 
-func (fis *TSK) GetInput(name fluffy.VariableName) *fluffy.Variable {
+func (fis *TSK[T]) GetInput(name fluffy.VariableName) *fluffy.Variable[T] {
 	for _, i := range fis.Inputs {
 		if i.Name == name {
 			return i
 		}
 	}
-	return &fluffy.Variable{Name: name}
+	return &fluffy.Variable[T]{Name: name}
 }
 
-func (fis *TSK) Activate(c fluffy.Clause, w num.Num) {
+func (fis *TSK[T]) Activate(c fluffy.Clause[T], w T) {
 	for i, o := range fis.Outputs {
 		if o.Name == c.Variable {
 			for _, t := range o.Terms {
 				if t.Name == c.Term {
-					fis.Outputs[i].evaluations = append(fis.Outputs[i].evaluations, wz{w: w, z: t.z})
+					fis.Outputs[i].evaluations = append(fis.Outputs[i].evaluations, wz[T]{w: w, z: t.z})
 				}
 			}
 		}
 	}
 }
 
-func (fis *TSK) Validate() error {
+func (fis *TSK[T]) Validate() error {
 	for _, o := range fis.Outputs {
 		for _, t := range o.Terms {
 			if n := len(t.Coeffs); n != 1 && n != len(fis.Inputs)+1 {
@@ -143,7 +141,7 @@ func (fis *TSK) Validate() error {
 	return nil
 }
 
-func (fis *TSK) Evaluate() {
+func (fis *TSK[T]) Evaluate() {
 	for i := range fis.Outputs {
 		fis.Outputs[i].reset(fis)
 	}
@@ -156,7 +154,7 @@ func (fis *TSK) Evaluate() {
 	}
 }
 
-func (fis *TSK) SetInput(name fluffy.VariableName, value num.Num) {
+func (fis *TSK[T]) SetInput(name fluffy.VariableName, value T) {
 	for i := range fis.Inputs {
 		if fis.Inputs[i].Name == name {
 			fis.Inputs[i].SetValue(value)
@@ -165,11 +163,11 @@ func (fis *TSK) SetInput(name fluffy.VariableName, value num.Num) {
 	}
 }
 
-func (fis *TSK) GetOutput(name fluffy.VariableName) num.Num {
+func (fis *TSK[T]) GetOutput(name fluffy.VariableName) T {
 	for _, i := range fis.Outputs {
 		if i.Name == name {
 			return i.GetValue()
 		}
 	}
-	return num.NaN
+	return num.NaN[T]()
 }

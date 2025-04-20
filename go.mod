@@ -12,8 +12,11 @@ require (
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
-	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
+	golang.org/x/image v0.0.0-20210216034530-4410531fe030 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )

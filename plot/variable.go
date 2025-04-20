@@ -10,7 +10,7 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {
+func Terms[T num.Num[T]](fn string, xmin, xmax float64, terms []fluffy.Term[T]) error {
 	graph := chart.Chart{}
 	f, err := os.Create(fn)
 	if err != nil {
@@ -23,7 +23,7 @@ func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {
 		}
 		for x := xmin; x <= xmax; x += (xmax - xmin) / 100.0 {
 			s.XValues = append(s.XValues, x)
-			s.YValues = append(s.YValues, v.MembershipValue(num.NewF(x)).Float())
+			s.YValues = append(s.YValues, v.MembershipValue(num.NewF[T](x)).Float())
 		}
 		graph.Series = append(graph.Series, s)
 	}
@@ -31,7 +31,7 @@ func Terms(fn string, xmin, xmax float64, terms []fluffy.Term) error {
 	return graph.Render(chart.PNG, f)
 }
 
-func MembershipFunctions(fn string, src *fluffy.Variable) error {
+func MembershipFunctions[T num.Num[T]](fn string, src *fluffy.Variable[T]) error {
 	graph := chart.Chart{}
 	f, err := os.Create(fn)
 	if err != nil {
@@ -48,7 +48,7 @@ func MembershipFunctions(fn string, src *fluffy.Variable) error {
 		}
 		for x := xmin; x <= xmax; x += (xmax - xmin) / 100.0 {
 			s.XValues = append(s.XValues, x)
-			s.YValues = append(s.YValues, v.MembershipValue(num.NewF(x)).Float())
+			s.YValues = append(s.YValues, v.MembershipValue(num.NewF[T](x)).Float())
 		}
 		graph.Series = append(graph.Series, s)
 	}

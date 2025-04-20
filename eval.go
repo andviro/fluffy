@@ -11,37 +11,37 @@ type VariableName string
 
 type TermName string
 
-type Clause struct {
+type Clause[T num.Num[T]] struct {
 	Variable VariableName `yaml:"variable" parser:"@Ident"`
 	Term     TermName     `yaml:"term" parser:"'=' @Ident"`
 }
 
-func (c Clause) Valid(f func(VariableName, TermName) error) error {
+func (c Clause[T]) Valid(f func(VariableName, TermName) error) error {
 	return f(c.Variable, c.Term)
 }
 
-func (c Clause) MarshalYAML() (interface{}, error) {
+func (c Clause[T]) MarshalYAML() (interface{}, error) {
 	return map[interface{}]interface{}{
 		c.Variable: c.Term,
 	}, nil
 }
 
-func C(variable VariableName, term TermName) Clause {
-	return Clause{variable, term}
+func C[T num.Num[T]](variable VariableName, term TermName) Clause[T] {
+	return Clause[T]{variable, term}
 }
 
-func (c Clause) String() string {
+func (c Clause[T]) String() string {
 	return fmt.Sprintf("%s=%s", c.Variable, c.Term)
 }
 
-func (c Clause) Evaluate(fis FIS) num.Num {
+func (c Clause[T]) Evaluate(fis FIS[T]) T {
 	v := fis.GetInput(c.Variable)
 	return v.GetTermValue(c.Term)
 }
 
-type Connector []Antecedent
+type Connector[T num.Num[T]] []Antecedent[T]
 
-func (a Connector) Valid(f func(VariableName, TermName) error) error {
+func (a Connector[T]) Valid(f func(VariableName, TermName) error) error {
 	for _, clause := range a {
 		if err := clause.Valid(f); err != nil {
 			return err
@@ -50,19 +50,19 @@ func (a Connector) Valid(f func(VariableName, TermName) error) error {
 	return nil
 }
 
-type And Connector
+type And[T num.Num[T]] Connector[T]
 
-func (a And) Valid(f func(VariableName, TermName) error) error {
-	return Connector(a).Valid(f)
+func (a And[T]) Valid(f func(VariableName, TermName) error) error {
+	return Connector[T](a).Valid(f)
 }
 
-func (a And) MarshalYAML() (interface{}, error) {
+func (a And[T]) MarshalYAML() (interface{}, error) {
 	return struct {
-		And []Antecedent `yaml:"and"`
+		And []Antecedent[T] `yaml:"and"`
 	}{a}, nil
 }
 
-func (c Connector) string(symbol string) string {
+func (c Connector[T]) string(symbol string) string {
 	var res []string
 	for _, e := range c {
 		res = append(res, fmt.Sprintf("%s", e))
@@ -70,9 +70,9 @@ func (c Connector) string(symbol string) string {
 	return fmt.Sprintf("(%s)", strings.Join(res, symbol))
 }
 
-func (a And) Evaluate(fis FIS) num.Num {
+func (a And[T]) Evaluate(fis FIS[T]) T {
 	if len(a) == 0 {
-		return num.NaN
+		return num.NaN[T]()
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -81,25 +81,25 @@ func (a And) Evaluate(fis FIS) num.Num {
 	return res
 }
 
-func (a And) String() string {
-	return (Connector)(a).string(" and ")
+func (a And[T]) String() string {
+	return Connector[T](a).string(" and ")
 }
 
-type Or Connector
+type Or[T num.Num[T]] Connector[T]
 
-func (a Or) Valid(f func(VariableName, TermName) error) error {
-	return Connector(a).Valid(f)
+func (a Or[T]) Valid(f func(VariableName, TermName) error) error {
+	return Connector[T](a).Valid(f)
 }
 
-func (a Or) MarshalYAML() (interface{}, error) {
+func (a Or[T]) MarshalYAML() (interface{}, error) {
 	return struct {
-		Or []Antecedent `yaml:"or"`
+		Or []Antecedent[T] `yaml:"or"`
 	}{a}, nil
 }
 
-func (a Or) Evaluate(fis FIS) num.Num {
+func (a Or[T]) Evaluate(fis FIS[T]) T {
 	if len(a) == 0 {
-		return num.ZERO
+		return num.ZERO[T]()
 	}
 	res := a[0].Evaluate(fis)
 	for _, b := range a[1:] {
@@ -108,20 +108,18 @@ func (a Or) Evaluate(fis FIS) num.Num {
 	return res
 }
 
-func (a Or) String() string {
-	return (Connector)(a).string(" or ")
+func (a Or[T]) String() string {
+	return Connector[T](a).string(" or ")
 }
 
-type Not struct {
-	Antecedent
+type Not[T num.Num[T]] struct {
+	Antecedent[T]
 }
 
-var one = num.NewI(1, 0)
-
-func (a Not) Evaluate(fis FIS) num.Num {
-	return one.Sub(a.Antecedent.Evaluate(fis))
+func (a Not[T]) Evaluate(fis FIS[T]) T {
+	return num.One[T]().Sub(a.Antecedent.Evaluate(fis))
 }
 
-func (a Not) String() string {
+func (a Not[T]) String() string {
 	return fmt.Sprintf("not %s", a.Antecedent)
 }

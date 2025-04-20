@@ -4,27 +4,27 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type Triangle struct {
-	A, B, C num.Num
+type Triangle[T num.Num[T]] struct {
+	A, B, C T
 }
 
-func (f Triangle) MarshalYAML() (interface{}, error) {
+func (f Triangle[T]) MarshalYAML() (any, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    num.Num `yaml:"a"`
-		B    num.Num `yaml:"b"`
-		C    num.Num `yaml:"c"`
-	}{"Triangle", f.A, f.B, f.C}, nil
+		Type string `yaml:"type"`
+		A    string `yaml:"a"`
+		B    string `yaml:"b"`
+		C    string `yaml:"c"`
+	}{"Triangle", f.A.String(), f.B.String(), f.C.String()}, nil
 }
 
-func (f Triangle) Value(x num.Num) num.Num {
+func (f Triangle[T]) Value(x T) T {
 	switch {
 	case x.Equal(f.B):
-		return one
+		return num.One[T]()
 	case x.LessThan(f.A):
-		return num.ZERO
+		return num.ZERO[T]()
 	case x.GreaterThanOrEqual(f.C):
-		return num.ZERO
+		return num.ZERO[T]()
 	case x.LessThanOrEqual(f.B):
 		return x.Sub(f.A).Div(f.B.Sub(f.A))
 	}

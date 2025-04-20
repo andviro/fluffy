@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (f *TSK) Dump() string {
+func (f *TSK[T]) Dump() string {
 	buf := new(bytes.Buffer)
 	for n, i := range f.Inputs {
 		var res []string

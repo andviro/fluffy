@@ -4,42 +4,42 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type LeftLinear struct {
-	A, B num.Num
+type LeftLinear[T num.Num[T]] struct {
+	A, B T
 }
 
 type linearDTO struct {
-	Type string  `yaml:"type"`
-	A    num.Num `yaml:"a"`
-	B    num.Num `yaml:"b"`
+	Type string `yaml:"type"`
+	A    string `yaml:"a"`
+	B    string `yaml:"b"`
 }
 
-func (l LeftLinear) MarshalYAML() (interface{}, error) {
-	return linearDTO{Type: "LeftLinear", A: l.A, B: l.B}, nil
+func (l LeftLinear[T]) MarshalYAML() (any, error) {
+	return linearDTO{Type: "LeftLinear", A: l.A.String(), B: l.B.String()}, nil
 }
 
-func (f LeftLinear) Value(x num.Num) num.Num {
+func (f LeftLinear[T]) Value(x T) T {
 	switch {
 	case x.LessThanOrEqual(f.A):
-		return one
+		return num.One[T]()
 	case x.GreaterThanOrEqual(f.B):
-		return num.ZERO
+		return num.ZERO[T]()
 	}
 	return f.B.Sub(x).Div(f.B.Sub(f.A))
 }
 
-type RightLinear LeftLinear
+type RightLinear[T num.Num[T]] LeftLinear[T]
 
-func (l RightLinear) MarshalYAML() (interface{}, error) {
-	return linearDTO{Type: "RightLinear", A: l.A, B: l.B}, nil
+func (l RightLinear[T]) MarshalYAML() (any, error) {
+	return linearDTO{Type: "RightLinear", A: l.A.String(), B: l.B.String()}, nil
 }
 
-func (f RightLinear) Value(x num.Num) num.Num {
+func (f RightLinear[T]) Value(x T) T {
 	switch {
 	case x.LessThanOrEqual(f.A):
-		return num.ZERO
+		return num.ZERO[T]()
 	case x.GreaterThanOrEqual(f.B):
-		return one
+		return num.One[T]()
 	}
 	return x.Sub(f.A).Div(f.B.Sub(f.A))
 }

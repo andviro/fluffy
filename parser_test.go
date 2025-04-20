@@ -8,10 +8,11 @@ import (
 	"github.com/andviro/goldie"
 
 	"github.com/andviro/fluffy/v2"
+	"github.com/andviro/fluffy/v2/num/fixed"
 )
 
 func TestParser(t *testing.T) {
-	r, err := fluffy.ParseRules(`
+	r, err := fluffy.ParseRules[fixed.Fixed](`
     1 : a = b & c = d | a = e -> z = y
     1.5 : x = y & (x = d | x = f) -> z = t
 `)

@@ -13,95 +13,96 @@ import (
 	"github.com/andviro/fluffy/v2/fis"
 	"github.com/andviro/fluffy/v2/mf"
 	"github.com/andviro/fluffy/v2/num"
+	"github.com/andviro/fluffy/v2/num/fixed"
 	"github.com/andviro/fluffy/v2/op"
 	"github.com/andviro/fluffy/v2/plot"
 )
 
-var one = num.NewF(1)
+var one = fixed.Fixed{}.NewF(1)
 
-var tipper = fis.TSK{
-	OrMethod: op.Probor,
-	Inputs: []*fluffy.Variable{
+var tipper = fis.TSK[fixed.Fixed]{
+	OrMethod: op.Probor[fixed.Fixed],
+	Inputs: []*fluffy.Variable[fixed.Fixed]{
 		{
 			Name: "food",
-			XMin: num.ZERO,
-			XMax: num.NewF(10),
-			Terms: []fluffy.Term{
+			XMin: fixed.ZERO,
+			XMax: one.NewF(10),
+			Terms: []fluffy.Term[fixed.Fixed]{
 				{
 					Name:           "delicious",
-					MembershipFunc: mf.RightLinear{A: num.NewF(7), B: num.NewF(9)},
+					MembershipFunc: mf.RightLinear[fixed.Fixed]{A: one.NewF(7), B: one.NewF(9)},
 				},
 				{
 					Name:           "rancid",
-					MembershipFunc: mf.LeftLinear{A: one, B: num.NewF(3)},
+					MembershipFunc: mf.LeftLinear[fixed.Fixed]{A: one, B: one.NewF(3)},
 				},
 			},
 		},
 		{
 			Name: "service",
-			XMin: num.ZERO,
-			XMax: num.NewF(10),
-			Terms: []fluffy.Term{
+			XMin: one.ZERO(),
+			XMax: one.NewF(10),
+			Terms: []fluffy.Term[fixed.Fixed]{
 				{
 					Name:           "excellent",
-					MembershipFunc: mf.RightGaussian{C: num.NewF(10.0), Sigma: num.NewF(1.5)},
+					MembershipFunc: mf.RightGaussian[fixed.Fixed]{C: one.NewF(10.0), Sigma: one.NewF(1.5)},
 				},
 				{
 					Name:           "good",
-					MembershipFunc: mf.Gaussian{C: num.NewF(5.0), Sigma: num.NewF(1.5)},
+					MembershipFunc: mf.Gaussian[fixed.Fixed]{C: one.NewF(5.0), Sigma: one.NewF(1.5)},
 				},
 				{
 					Name:           "poor",
-					MembershipFunc: mf.LeftGaussian{C: num.ZERO, Sigma: num.NewF(1.5)},
+					MembershipFunc: mf.LeftGaussian[fixed.Fixed]{C: one.ZERO(), Sigma: one.NewF(1.5)},
 				},
 			},
 		},
 	},
-	Outputs: []fis.TSKOutput{
+	Outputs: []fis.TSKOutput[fixed.Fixed]{
 		{
 			Name: "tip",
-			Terms: []fis.TSKTerm{
+			Terms: []fis.TSKTerm[fixed.Fixed]{
 				{
 					Name:   "average",
-					Coeffs: []num.Num{num.NewF(15)},
+					Coeffs: []fixed.Fixed{one.NewF(15)},
 				},
 				{
 					Name:   "cheap",
-					Coeffs: []num.Num{num.NewF(5)},
+					Coeffs: []fixed.Fixed{one.NewF(5)},
 				},
 				{
 					Name:   "generous",
-					Coeffs: []num.Num{num.NewF(25)},
+					Coeffs: []fixed.Fixed{one.NewF(25)},
 				},
 			},
 		},
 	},
-	Rules: []fluffy.Rule{
+	Rules: []fluffy.Rule[fixed.Fixed]{
 		{
 			Weight: one,
-			Antecedent: fluffy.Or{
-				fluffy.C("food", "rancid"),
-				fluffy.C("service", "poor"),
+			Antecedent: fluffy.Or[fixed.Fixed]{
+				fluffy.C[fixed.Fixed]("food", "rancid"),
+				fluffy.C[fixed.Fixed]("service", "poor"),
 			},
-			Consequents: []fluffy.Clause{
-				fluffy.C("tip", "cheap"),
+			Consequents: []fluffy.Clause[fixed.Fixed]{
+				fluffy.C[fixed.Fixed]("tip", "cheap"),
 			},
 		},
 		{
 			Weight:     one,
-			Antecedent: fluffy.C("service", "good"),
-			Consequents: []fluffy.Clause{
-				fluffy.C("tip", "average"),
+			Antecedent: fluffy.C[fixed.Fixed]("service", "good"),
+			Consequents: []fluffy.Clause[fixed.Fixed]{
+				fluffy.C[fixed.Fixed]("tip", "average"),
 			},
 		},
 		{
 			Weight: one,
-			Antecedent: fluffy.Or{
-				fluffy.C("food", "delicious"),
-				fluffy.C("service", "excellent"),
+			Antecedent: fluffy.Or[fixed.Fixed]{
+				fluffy.C[fixed.Fixed]("food", "delicious"),
+				fluffy.C[fixed.Fixed]("service", "excellent"),
 			},
-			Consequents: []fluffy.Clause{
-				fluffy.C("tip", "generous"),
+			Consequents: []fluffy.Clause[fixed.Fixed]{
+				fluffy.C[fixed.Fixed]("tip", "generous"),
 			},
 		},
 	},
@@ -125,8 +126,8 @@ func TestTSK_Tipper(t *testing.T) {
 		fmt.Fprintf(buf, "%s\n", r)
 	}
 	for _, tc := range []testCase{{1, 2}, {3, 5}, {2, 7}, {3, 1}, {1, 3}, {8, 3}, {3, 8}} {
-		tipper.SetInput("service", num.NewF(tc.Service))
-		tipper.SetInput("food", num.NewF(tc.Food))
+		tipper.SetInput("service", num.NewF[fixed.Fixed](tc.Service))
+		tipper.SetInput("food", num.NewF[fixed.Fixed](tc.Food))
 		tipper.Evaluate()
 		fmt.Fprintf(buf, "%v => %v\n", tc, tipper.GetOutput("tip"))
 	}

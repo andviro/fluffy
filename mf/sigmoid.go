@@ -6,44 +6,44 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type Sigmoid struct {
-	A, C num.Num
+type Sigmoid[T num.Num[T]] struct {
+	A, C T
 }
 
 type sigmoidDTO struct {
 	Type string
-	A    num.Num `yaml:"a"`
-	C    num.Num `yaml:"c"`
+	A    string `yaml:"a"`
+	C    string `yaml:"c"`
 }
 
-func (f Sigmoid) MarshalYAML() (interface{}, error) {
-	return sigmoidDTO{Type: "Sigmoid", C: f.C, A: f.A}, nil
+func (f Sigmoid[T]) MarshalYAML() (any, error) {
+	return sigmoidDTO{Type: "Sigmoid", C: f.C.String(), A: f.A.String()}, nil
 }
 
-func sigmoid(x, a, c num.Num) num.Num {
-	return num.NewF(1.0 / (1.0 + math.Exp(-a.Float()*(x.Float()-c.Float()))))
+func sigmoid[T num.Num[T]](x, a, c T) T {
+	return num.NewF[T](1.0 / (1.0 + math.Exp(-a.Float()*(x.Float()-c.Float()))))
 }
 
-func (f *Sigmoid) Value(x num.Num) num.Num {
+func (f *Sigmoid[T]) Value(x T) T {
 	return sigmoid(x, f.A, f.C)
 }
 
-type DSigmoid struct {
-	A1, C1, A2, C2 num.Num
+type DSigmoid[T num.Num[T]] struct {
+	A1, C1, A2, C2 T
 }
 
 type dsigmoidDTO struct {
 	Type string
-	A1   num.Num `yaml:"a1"`
-	C1   num.Num `yaml:"c1"`
-	A2   num.Num `yaml:"a2"`
-	C2   num.Num `yaml:"c2"`
+	A1   string `yaml:"a1"`
+	C1   string `yaml:"c1"`
+	A2   string `yaml:"a2"`
+	C2   string `yaml:"c2"`
 }
 
-func (f DSigmoid) MarshalYAML() (interface{}, error) {
-	return dsigmoidDTO{Type: "DSigmoid", C1: f.C1, A1: f.A1, C2: f.C2, A2: f.A2}, nil
+func (f DSigmoid[T]) MarshalYAML() (any, error) {
+	return dsigmoidDTO{Type: "DSigmoid", C1: f.C1.String(), A1: f.A1.String(), C2: f.C2.String(), A2: f.A2.String()}, nil
 }
 
-func (f *DSigmoid) Value(x num.Num) num.Num {
+func (f *DSigmoid[T]) Value(x T) T {
 	return sigmoid(x, f.A1, f.C1).Sub(sigmoid(x, f.A2, f.C2))
 }

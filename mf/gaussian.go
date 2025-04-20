@@ -4,52 +4,47 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type Gaussian struct {
-	C     num.Num
-	Sigma num.Num
+type Gaussian[T num.Num[T]] struct {
+	C     T
+	Sigma T
 }
-
-var (
-	one = num.NewI(1, 0)
-	two = num.NewI(2, 0)
-)
 
 type gaussianDTO struct {
-	Type  string  `yaml:"type"`
-	C     num.Num `yaml:"c"`
-	Sigma num.Num `yaml:"sigma"`
+	Type  string `yaml:"type"`
+	C     string `yaml:"c"`
+	Sigma string `yaml:"sigma"`
 }
 
-func (f Gaussian) MarshalYAML() (interface{}, error) {
-	return gaussianDTO{Type: "Gaussian", C: f.C, Sigma: f.Sigma}, nil
+func (f Gaussian[T]) MarshalYAML() (any, error) {
+	return gaussianDTO{Type: "Gaussian", C: f.C.String(), Sigma: f.Sigma.String()}, nil
 }
 
-func (f Gaussian) Value(x num.Num) num.Num {
-	return num.Exp(num.Neg(num.Sqr(x.Sub(f.C)).Div(two.Mul(num.Sqr(f.Sigma)))))
+func (f Gaussian[T]) Value(x T) T {
+	return x.Exp((num.Sqr(x.Sub(f.C)).Div(num.Two[T]().Mul(num.Sqr(f.Sigma)))).Neg())
 }
 
-type LeftGaussian Gaussian
+type LeftGaussian[T num.Num[T]] Gaussian[T]
 
-func (f LeftGaussian) Value(x num.Num) num.Num {
+func (f LeftGaussian[T]) Value(x T) T {
 	if x.LessThanOrEqual(f.C) {
-		return one
+		return num.One[T]()
 	}
-	return Gaussian(f).Value(x)
+	return Gaussian[T](f).Value(x)
 }
 
-func (f LeftGaussian) MarshalYAML() (interface{}, error) {
-	return gaussianDTO{Type: "LeftGaussian", C: f.C, Sigma: f.Sigma}, nil
+func (f LeftGaussian[T]) MarshalYAML() (any, error) {
+	return gaussianDTO{Type: "LeftGaussian", C: f.C.String(), Sigma: f.Sigma.String()}, nil
 }
 
-type RightGaussian Gaussian
+type RightGaussian[T num.Num[T]] Gaussian[T]
 
-func (f RightGaussian) Value(x num.Num) num.Num {
+func (f RightGaussian[T]) Value(x T) T {
 	if x.GreaterThanOrEqual(f.C) {
-		return one
+		return num.One[T]()
 	}
-	return Gaussian(f).Value(x)
+	return Gaussian[T](f).Value(x)
 }
 
-func (f RightGaussian) MarshalYAML() (interface{}, error) {
-	return gaussianDTO{Type: "RightGaussian", C: f.C, Sigma: f.Sigma}, nil
+func (f RightGaussian[T]) MarshalYAML() (any, error) {
+	return gaussianDTO{Type: "RightGaussian", C: f.C.String(), Sigma: f.Sigma.String()}, nil
 }

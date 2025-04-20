@@ -7,61 +7,68 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type Binary func(num.Num, num.Num) num.Num
+type Binary[T num.Num[T]] func(T, T) T
 
-func (b Binary) MarshalYAML() (interface{}, error) {
+func (b Binary[T]) MarshalYAML() (interface{}, error) {
 	return runtime.FuncForPC(reflect.ValueOf(b).Pointer()).Name(), nil
 }
 
-func (b Binary) IsZero() bool {
+func (b Binary[T]) IsZero() bool {
 	return b == nil
 }
 
-var (
-	one = num.NewI(1, 0)
-	two = num.NewI(2, 0)
-)
+func one[T num.Num[T]]() (res T) {
+	return res.NewI(1, 0)
+}
 
-func Nilmax(a num.Num, b num.Num) num.Num {
-	if a.Add(b).LessThan(one) {
+func two[T num.Num[T]]() (res T) {
+	return res.NewI(2, 0)
+}
+
+func Nilmax[T num.Num[T]](a T, b T) T {
+	if a.Add(b).LessThan(one[T]()) {
 		return num.Max(a, b)
 	}
-	return one
+	return one[T]()
 }
 
-func Hsum(a num.Num, b num.Num) num.Num {
+func Hsum[T num.Num[T]](a T, b T) T {
 	// return (a + b - (2 * a * b)) / (1 - (a * b))
-	return (a.Add(b).Sub(two.Mul(a).Mul(b))).Div(one.Sub(a.Mul(b)))
+	return (a.Add(b).Sub(two[T]().Mul(a).Mul(b))).Div(one[T]().Sub(a.Mul(b)))
 }
 
-func Esum(a num.Num, b num.Num) num.Num {
+func Esum[T num.Num[T]](a T, b T) T {
 	// return (a + b) / (1 + a*b)
-	return a.Add(b).Div(one.Add(a.Mul(b)))
+	return a.Add(b).Div(one[T]().Add(a.Mul(b)))
 }
 
-func Drs(a num.Num, b num.Num) num.Num {
+func Drs[T num.Num[T]](a T, b T) T {
 	switch {
 	case a.IsZero():
 		return b
 	case b.IsZero():
 		return a
 	}
-	return one
+	return one[T]()
 }
 
-func Bsum(a num.Num, b num.Num) num.Num {
-	return num.Min(one, a.Add(b))
+func Bsum[T num.Num[T]](a T, b T) T {
+	return num.Min(one[T](), a.Add(b))
 }
 
-func Probor(a num.Num, b num.Num) num.Num {
+func Probor[T num.Num[T]](a T, b T) T {
 	// return a + b - (a * b)
 	return a.Add(b).Sub(a.Mul(b))
 }
 
-func Mul(a num.Num, b num.Num) num.Num {
+func Mul[T num.Num[T]](a T, b T) T {
 	return a.Mul(b)
 }
 
-var Max = num.Max
+func Max[T num.Num[T]](a T, rest ...T) T {
+	return num.Max(a, rest...)
+}
 
-var Min = num.Min
+func Min[T num.Num[T]](a T, rest ...T) T {
+	return num.Min(a, rest...)
+}

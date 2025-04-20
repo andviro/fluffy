@@ -4,20 +4,20 @@ import (
 	"github.com/andviro/fluffy/v2/num"
 )
 
-type Singleton struct {
-	A num.Num
+type Singleton[T num.Num[T]] struct {
+	A T
 }
 
-func (f Singleton) MarshalYAML() (interface{}, error) {
+func (f Singleton[T]) MarshalYAML() (any, error) {
 	return struct {
-		Type string  `yaml:"type"`
-		A    num.Num `yaml:"a"`
-	}{"Singleton", f.A}, nil
+		Type string `yaml:"type"`
+		A    string `yaml:"a"`
+	}{"Singleton", f.A.String()}, nil
 }
 
-func (f *Singleton) Value(x num.Num) num.Num {
+func (f *Singleton[T]) Value(x T) T {
 	if x.Equal(f.A) {
-		return one
+		return num.One[T]()
 	}
-	return num.ZERO
+	return num.ZERO[T]()
 }
