@@ -20,8 +20,8 @@ func (c Clause[T]) Valid(f func(VariableName, TermName) error) error {
 	return f(c.Variable, c.Term)
 }
 
-func (c Clause[T]) MarshalYAML() (interface{}, error) {
-	return map[interface{}]interface{}{
+func (c Clause[T]) MarshalYAML() (any, error) {
+	return map[any]any{
 		c.Variable: c.Term,
 	}, nil
 }
@@ -56,7 +56,7 @@ func (a And[T]) Valid(f func(VariableName, TermName) error) error {
 	return Connector[T](a).Valid(f)
 }
 
-func (a And[T]) MarshalYAML() (interface{}, error) {
+func (a And[T]) MarshalYAML() (any, error) {
 	return struct {
 		And []Antecedent[T] `yaml:"and"`
 	}{a}, nil
@@ -91,7 +91,7 @@ func (a Or[T]) Valid(f func(VariableName, TermName) error) error {
 	return Connector[T](a).Valid(f)
 }
 
-func (a Or[T]) MarshalYAML() (interface{}, error) {
+func (a Or[T]) MarshalYAML() (any, error) {
 	return struct {
 		Or []Antecedent[T] `yaml:"or"`
 	}{a}, nil

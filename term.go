@@ -6,7 +6,7 @@ import (
 
 type MembershipFunc[T num.Num[T]] interface {
 	Value(x T) T
-	MarshalYAML() (interface{}, error)
+	MarshalYAML() (any, error)
 }
 
 type Term[T num.Num[T]] struct {

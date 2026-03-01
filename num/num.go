@@ -3,7 +3,7 @@
 // generics
 package num
 
-type Num[T any] interface {
+type Num[T Num[T]] interface {
 	Float() float64
 	Cmp(a T) int
 	NewF(float64) T

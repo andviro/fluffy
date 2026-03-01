@@ -11,7 +11,7 @@ var Epsilon = 0.0001
 
 type Antecedent[T num.Num[T]] interface {
 	Evaluator[T]
-	MarshalYAML() (interface{}, error)
+	MarshalYAML() (any, error)
 	Valid(func(variable VariableName, term TermName) error) error
 }
 
@@ -27,7 +27,7 @@ type Rule[T num.Num[T]] struct {
 	Consequents []Clause[T]
 }
 
-func (r Rule[T]) MarshalYAML() (interface{}, error) {
+func (r Rule[T]) MarshalYAML() (any, error) {
 	return struct {
 		Weight      float64
 		AndMethod   op.Binary[T]  `yaml:"andMethod,omitempty"`

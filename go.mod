@@ -1,6 +1,6 @@
 module github.com/andviro/fluffy/v2
 
-go 1.24
+go 1.26
 
 require (
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5

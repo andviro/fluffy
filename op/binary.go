@@ -9,7 +9,7 @@ import (
 
 type Binary[T num.Num[T]] func(T, T) T
 
-func (b Binary[T]) MarshalYAML() (interface{}, error) {
+func (b Binary[T]) MarshalYAML() (any, error) {
 	return runtime.FuncForPC(reflect.ValueOf(b).Pointer()).Name(), nil
 }
 

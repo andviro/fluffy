@@ -1,5 +1,7 @@
 package fluffy
 
+import "maps"
+
 import "github.com/andviro/fluffy/v2/num"
 
 type Variable[T num.Num[T]] struct {
@@ -27,17 +29,13 @@ func (v *Variable[T]) GetTermValue(term TermName) T {
 
 func (v *Variable[T]) GetTermValues() map[TermName]T {
 	vs := make(map[TermName]T, len(v.termValues))
-	for k, v := range v.termValues {
-		vs[k] = v
-	}
+	maps.Copy(vs, v.termValues)
 	return vs
 }
 
 func (v *Variable[T]) SetTermValues(src map[TermName]T) {
 	v.termValues = make(map[TermName]T, len(src))
-	for k, val := range src {
-		v.termValues[k] = val
-	}
+	maps.Copy(v.termValues, src)
 }
 
 func (v *Variable[T]) GetValue() T {
