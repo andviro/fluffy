@@ -3,6 +3,10 @@
 // generics
 package num
 
+import (
+	"strings"
+)
+
 type Num[T Num[T]] interface {
 	Float() float64
 	Cmp(a T) int
@@ -29,6 +33,30 @@ type Num[T Num[T]] interface {
 	Sign() int
 	Int() int64
 	String() string
+}
+
+func StringN[T Num[T]](f T, decimals int) string {
+	if f.IsNaN() {
+		return "NaN"
+	}
+	s := f.String()
+	if decimals < 0 {
+		return s
+	}
+	ss := strings.Split(f.String(), ".")
+	if len(ss) == 1 {
+		s += "."
+		ss = append(ss, ".")
+	}
+	point := len(ss[0])
+	if decimals == 0 {
+		return s[:point]
+	} else {
+		for i := point + len(ss[1]); i < point+decimals+1; i++ {
+			s += "0"
+		}
+		return s[:point+decimals+1]
+	}
 }
 
 func ZERO[T Num[T]]() (res T) {
