@@ -118,3 +118,19 @@ func Min[T Num[T]](first T, rest ...T) T {
 	}
 	return ans
 }
+
+func Floor[T Num[T]](val T) T {
+	return val.NewI(val.Int(), 0)
+}
+
+func Ceil[T Num[T]](val T) T {
+	floor := Floor(val)
+	if floor.LessThan(val) {
+		return floor.Add(NewI[T](1, 0))
+	}
+	return floor
+}
+
+func NearestIncrement[T Num[T]](val T, increment T) T {
+	return NewI[T](val.Div(increment).Add(NewF[T](0.5)).Int(), 0).Mul(increment)
+}
